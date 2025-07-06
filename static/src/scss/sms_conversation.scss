@@ -1,0 +1,14 @@
+.o_conversation_container {
+    padding: 12px;
+    min-height: 120px;
+}
+
+.o_message_line {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px;
+}
+
+.o_conversation_preview {
+    max-height: 200px;
+    overflow-y: auto;
+}

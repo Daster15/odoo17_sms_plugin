@@ -1,0 +1,753 @@
+<?xml version="1.0" ?>
+<odoo>
+  <record id="sms_line_extra_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 1</field>
+    <field name="date">2023-07-01 09:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 2</field>
+    <field name="date">2023-07-01 10:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 3</field>
+    <field name="date">2023-07-01 11:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_4" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 4</field>
+    <field name="date">2023-07-01 12:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_5" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 5</field>
+    <field name="date">2023-07-01 13:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_6" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 6</field>
+    <field name="date">2023-07-01 14:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_7" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 7</field>
+    <field name="date">2023-07-01 15:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_8" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 8</field>
+    <field name="date">2023-07-01 16:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_9" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 9</field>
+    <field name="date">2023-07-01 17:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_10" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 10</field>
+    <field name="date">2023-07-01 18:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_11" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 11</field>
+    <field name="date">2023-07-01 19:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_12" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 12</field>
+    <field name="date">2023-07-01 20:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_13" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 13</field>
+    <field name="date">2023-07-01 21:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_14" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 14</field>
+    <field name="date">2023-07-01 22:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_15" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 15</field>
+    <field name="date">2023-07-01 23:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_16" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 16</field>
+    <field name="date">2023-07-02 00:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_17" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 17</field>
+    <field name="date">2023-07-02 01:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_18" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 18</field>
+    <field name="date">2023-07-02 02:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_19" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 19</field>
+    <field name="date">2023-07-02 03:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_20" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 20</field>
+    <field name="date">2023-07-02 04:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_21" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 21</field>
+    <field name="date">2023-07-02 05:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_22" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 22</field>
+    <field name="date">2023-07-02 06:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_23" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 23</field>
+    <field name="date">2023-07-02 07:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_24" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 24</field>
+    <field name="date">2023-07-02 08:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_25" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 25</field>
+    <field name="date">2023-07-02 09:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_26" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 26</field>
+    <field name="date">2023-07-02 10:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_27" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 27</field>
+    <field name="date">2023-07-02 11:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_28" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 28</field>
+    <field name="date">2023-07-02 12:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_29" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 29</field>
+    <field name="date">2023-07-02 13:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_30" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 30</field>
+    <field name="date">2023-07-02 14:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_31" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 31</field>
+    <field name="date">2023-07-02 15:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_32" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 32</field>
+    <field name="date">2023-07-02 16:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_33" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 33</field>
+    <field name="date">2023-07-02 17:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_34" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_1"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 34</field>
+    <field name="date">2023-07-02 18:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_35" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 35</field>
+    <field name="date">2023-07-02 19:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_36" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 36</field>
+    <field name="date">2023-07-02 20:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_37" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 37</field>
+    <field name="date">2023-07-02 21:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_38" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 38</field>
+    <field name="date">2023-07-02 22:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_39" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 39</field>
+    <field name="date">2023-07-02 23:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_40" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 40</field>
+    <field name="date">2023-07-03 00:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_41" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 41</field>
+    <field name="date">2023-07-03 01:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_42" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 42</field>
+    <field name="date">2023-07-03 02:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_43" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 43</field>
+    <field name="date">2023-07-03 03:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_44" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 44</field>
+    <field name="date">2023-07-03 04:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_45" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 45</field>
+    <field name="date">2023-07-03 05:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_46" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 46</field>
+    <field name="date">2023-07-03 06:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_47" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 47</field>
+    <field name="date">2023-07-03 07:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_48" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 48</field>
+    <field name="date">2023-07-03 08:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_49" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 49</field>
+    <field name="date">2023-07-03 09:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_50" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 50</field>
+    <field name="date">2023-07-03 10:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_51" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 51</field>
+    <field name="date">2023-07-03 11:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_52" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 52</field>
+    <field name="date">2023-07-03 12:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_53" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 53</field>
+    <field name="date">2023-07-03 13:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_54" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 54</field>
+    <field name="date">2023-07-03 14:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_55" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 55</field>
+    <field name="date">2023-07-03 15:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_56" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 56</field>
+    <field name="date">2023-07-03 16:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_57" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 57</field>
+    <field name="date">2023-07-03 17:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_58" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 58</field>
+    <field name="date">2023-07-03 18:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_59" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 59</field>
+    <field name="date">2023-07-03 19:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_60" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 60</field>
+    <field name="date">2023-07-03 20:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_61" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 61</field>
+    <field name="date">2023-07-03 21:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_62" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 62</field>
+    <field name="date">2023-07-03 22:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_63" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 63</field>
+    <field name="date">2023-07-03 23:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_64" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 64</field>
+    <field name="date">2023-07-04 00:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_65" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 65</field>
+    <field name="date">2023-07-04 01:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_66" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 66</field>
+    <field name="date">2023-07-04 02:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_67" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 67</field>
+    <field name="date">2023-07-04 03:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_68" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_2"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 68</field>
+    <field name="date">2023-07-04 04:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_69" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 69</field>
+    <field name="date">2023-07-04 05:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_70" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 70</field>
+    <field name="date">2023-07-04 06:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_71" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 71</field>
+    <field name="date">2023-07-04 07:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_72" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 72</field>
+    <field name="date">2023-07-04 08:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_73" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 73</field>
+    <field name="date">2023-07-04 09:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_74" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 74</field>
+    <field name="date">2023-07-04 10:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_75" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 75</field>
+    <field name="date">2023-07-04 11:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_76" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 76</field>
+    <field name="date">2023-07-04 12:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_77" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 77</field>
+    <field name="date">2023-07-04 13:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_78" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 78</field>
+    <field name="date">2023-07-04 14:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_79" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 79</field>
+    <field name="date">2023-07-04 15:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_80" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 80</field>
+    <field name="date">2023-07-04 16:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_81" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 81</field>
+    <field name="date">2023-07-04 17:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_82" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 82</field>
+    <field name="date">2023-07-04 18:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_83" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 83</field>
+    <field name="date">2023-07-04 19:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_84" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 84</field>
+    <field name="date">2023-07-04 20:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_85" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 85</field>
+    <field name="date">2023-07-04 21:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_86" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 86</field>
+    <field name="date">2023-07-04 22:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_87" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 87</field>
+    <field name="date">2023-07-04 23:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_88" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 88</field>
+    <field name="date">2023-07-05 00:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_89" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 89</field>
+    <field name="date">2023-07-05 01:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_90" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 90</field>
+    <field name="date">2023-07-05 02:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_91" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 91</field>
+    <field name="date">2023-07-05 03:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_92" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 92</field>
+    <field name="date">2023-07-05 04:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_93" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 93</field>
+    <field name="date">2023-07-05 05:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_94" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 94</field>
+    <field name="date">2023-07-05 06:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_95" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 95</field>
+    <field name="date">2023-07-05 07:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_96" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 96</field>
+    <field name="date">2023-07-05 08:00:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_extra_97" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 97</field>
+    <field name="date">2023-07-05 09:00:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_98" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 98</field>
+    <field name="date">2023-07-05 10:00:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_extra_99" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">out</field>
+    <field name="body">Automatyczna wiadomość nr 99</field>
+    <field name="date">2023-07-05 11:00:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_extra_100" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_3"/>
+    <field name="direction">in</field>
+    <field name="body">Automatyczna wiadomość nr 100</field>
+    <field name="date">2023-07-05 12:00:00</field>
+    <field name="status">draft</field>
+  </record>
+</odoo>

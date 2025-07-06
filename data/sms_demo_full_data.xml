@@ -1,0 +1,1408 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="res_partner_demo_1" model="res.partner">
+    <field name="name">Demo Partner 1</field>
+    <field name="phone">+48070000001</field>
+  </record>
+  <record id="res_partner_demo_2" model="res.partner">
+    <field name="name">Demo Partner 2</field>
+    <field name="phone">+48070000002</field>
+  </record>
+  <record id="res_partner_demo_3" model="res.partner">
+    <field name="name">Demo Partner 3</field>
+    <field name="phone">+48070000003</field>
+  </record>
+  <record id="res_partner_demo_4" model="res.partner">
+    <field name="name">Demo Partner 4</field>
+    <field name="phone">+48070000004</field>
+  </record>
+  <record id="res_partner_demo_5" model="res.partner">
+    <field name="name">Demo Partner 5</field>
+    <field name="phone">+48070000005</field>
+  </record>
+  <record id="res_partner_demo_6" model="res.partner">
+    <field name="name">Demo Partner 6</field>
+    <field name="phone">+48070000006</field>
+  </record>
+  <record id="res_partner_demo_7" model="res.partner">
+    <field name="name">Demo Partner 7</field>
+    <field name="phone">+48070000007</field>
+  </record>
+  <record id="res_partner_demo_8" model="res.partner">
+    <field name="name">Demo Partner 8</field>
+    <field name="phone">+48070000008</field>
+  </record>
+  <record id="res_partner_demo_9" model="res.partner">
+    <field name="name">Demo Partner 9</field>
+    <field name="phone">+48070000009</field>
+  </record>
+  <record id="res_partner_demo_10" model="res.partner">
+    <field name="name">Demo Partner 10</field>
+    <field name="phone">+48070000010</field>
+  </record>
+  <record id="res_partner_demo_11" model="res.partner">
+    <field name="name">Demo Partner 11</field>
+    <field name="phone">+48070000011</field>
+  </record>
+  <record id="res_partner_demo_12" model="res.partner">
+    <field name="name">Demo Partner 12</field>
+    <field name="phone">+48070000012</field>
+  </record>
+  <record id="res_partner_demo_13" model="res.partner">
+    <field name="name">Demo Partner 13</field>
+    <field name="phone">+48070000013</field>
+  </record>
+  <record id="res_partner_demo_14" model="res.partner">
+    <field name="name">Demo Partner 14</field>
+    <field name="phone">+48070000014</field>
+  </record>
+  <record id="res_partner_demo_15" model="res.partner">
+    <field name="name">Demo Partner 15</field>
+    <field name="phone">+48070000015</field>
+  </record>
+  <record id="res_partner_demo_16" model="res.partner">
+    <field name="name">Demo Partner 16</field>
+    <field name="phone">+48070000016</field>
+  </record>
+  <record id="res_partner_demo_17" model="res.partner">
+    <field name="name">Demo Partner 17</field>
+    <field name="phone">+48070000017</field>
+  </record>
+  <record id="res_partner_demo_18" model="res.partner">
+    <field name="name">Demo Partner 18</field>
+    <field name="phone">+48070000018</field>
+  </record>
+  <record id="res_partner_demo_19" model="res.partner">
+    <field name="name">Demo Partner 19</field>
+    <field name="phone">+48070000019</field>
+  </record>
+  <record id="res_partner_demo_20" model="res.partner">
+    <field name="name">Demo Partner 20</field>
+    <field name="phone">+48070000020</field>
+  </record>
+  <record id="sms_conversation_demo_1" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_1"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_1_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_1"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 1</field>
+    <field name="date">2023-07-01 09:10:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_1_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_1"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 1</field>
+    <field name="date">2023-07-01 09:20:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_1_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_1"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 1</field>
+    <field name="date">2023-07-01 09:30:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_conversation_demo_2" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_2"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_2_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_2"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 2</field>
+    <field name="date">2023-07-01 10:10:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_2_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_2"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 2</field>
+    <field name="date">2023-07-01 10:20:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_2_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_2"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 2</field>
+    <field name="date">2023-07-01 10:30:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_3" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_3"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_3_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_3"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 3</field>
+    <field name="date">2023-07-01 11:10:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_3_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_3"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 3</field>
+    <field name="date">2023-07-01 11:20:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_3_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_3"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 3</field>
+    <field name="date">2023-07-01 11:30:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_conversation_demo_4" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_4"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_4_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_4"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 4</field>
+    <field name="date">2023-07-01 12:10:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_4_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_4"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 4</field>
+    <field name="date">2023-07-01 12:20:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_4_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_4"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 4</field>
+    <field name="date">2023-07-01 12:30:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_5" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_5"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_5_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_5"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 5</field>
+    <field name="date">2023-07-01 13:10:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_5_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_5"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 5</field>
+    <field name="date">2023-07-01 13:20:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_5_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_5"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 5</field>
+    <field name="date">2023-07-01 13:30:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_conversation_demo_6" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_6"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_6_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_6"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 6</field>
+    <field name="date">2023-07-01 14:10:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_6_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_6"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 6</field>
+    <field name="date">2023-07-01 14:20:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_6_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_6"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 6</field>
+    <field name="date">2023-07-01 14:30:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_7" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_7"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_7_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_7"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 7</field>
+    <field name="date">2023-07-01 15:10:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_7_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_7"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 7</field>
+    <field name="date">2023-07-01 15:20:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_7_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_7"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 7</field>
+    <field name="date">2023-07-01 15:30:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_conversation_demo_8" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_8"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_8_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_8"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 8</field>
+    <field name="date">2023-07-01 16:10:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_8_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_8"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 8</field>
+    <field name="date">2023-07-01 16:20:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_8_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_8"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 8</field>
+    <field name="date">2023-07-01 16:30:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_9" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_9"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_9_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_9"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 9</field>
+    <field name="date">2023-07-01 17:10:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_9_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_9"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 9</field>
+    <field name="date">2023-07-01 17:20:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_9_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_9"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 9</field>
+    <field name="date">2023-07-01 17:30:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_conversation_demo_10" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_10"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_10_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_10"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 10</field>
+    <field name="date">2023-07-01 18:10:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_10_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_10"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 10</field>
+    <field name="date">2023-07-01 18:20:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_10_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_10"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 10</field>
+    <field name="date">2023-07-01 18:30:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_11" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_11"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_11_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_11"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 11</field>
+    <field name="date">2023-07-01 19:10:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_11_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_11"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 11</field>
+    <field name="date">2023-07-01 19:20:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_11_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_11"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 11</field>
+    <field name="date">2023-07-01 19:30:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_conversation_demo_12" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_12"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_12_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_12"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 12</field>
+    <field name="date">2023-07-01 20:10:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_12_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_12"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 12</field>
+    <field name="date">2023-07-01 20:20:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_12_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_12"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 12</field>
+    <field name="date">2023-07-01 20:30:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_13" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_13"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_13_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_13"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 13</field>
+    <field name="date">2023-07-01 21:10:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_13_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_13"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 13</field>
+    <field name="date">2023-07-01 21:20:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_13_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_13"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 13</field>
+    <field name="date">2023-07-01 21:30:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_conversation_demo_14" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_14"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_14_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_14"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 14</field>
+    <field name="date">2023-07-01 22:10:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_14_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_14"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 14</field>
+    <field name="date">2023-07-01 22:20:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_14_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_14"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 14</field>
+    <field name="date">2023-07-01 22:30:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_15" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_15"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_15_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_15"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 15</field>
+    <field name="date">2023-07-01 23:10:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_15_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_15"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 15</field>
+    <field name="date">2023-07-01 23:20:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_15_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_15"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 15</field>
+    <field name="date">2023-07-01 23:30:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_conversation_demo_16" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_16"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_16_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_16"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 16</field>
+    <field name="date">2023-07-02 00:10:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_16_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_16"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 16</field>
+    <field name="date">2023-07-02 00:20:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_16_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_16"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 16</field>
+    <field name="date">2023-07-02 00:30:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_17" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_17"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_17_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_17"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 17</field>
+    <field name="date">2023-07-02 01:10:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_17_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_17"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 17</field>
+    <field name="date">2023-07-02 01:20:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_17_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_17"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 17</field>
+    <field name="date">2023-07-02 01:30:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_conversation_demo_18" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_18"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_18_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_18"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 18</field>
+    <field name="date">2023-07-02 02:10:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_18_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_18"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 18</field>
+    <field name="date">2023-07-02 02:20:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_18_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_18"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 18</field>
+    <field name="date">2023-07-02 02:30:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_19" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_19"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_19_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_19"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 19</field>
+    <field name="date">2023-07-02 03:10:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_19_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_19"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 19</field>
+    <field name="date">2023-07-02 03:20:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_19_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_19"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 19</field>
+    <field name="date">2023-07-02 03:30:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_conversation_demo_20" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_20"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_20_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_20"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 20</field>
+    <field name="date">2023-07-02 04:10:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_20_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_20"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 20</field>
+    <field name="date">2023-07-02 04:20:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_20_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_20"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 20</field>
+    <field name="date">2023-07-02 04:30:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_21" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_1"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_21_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_21"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 21</field>
+    <field name="date">2023-07-02 05:10:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_21_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_21"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 21</field>
+    <field name="date">2023-07-02 05:20:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_21_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_21"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 21</field>
+    <field name="date">2023-07-02 05:30:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_conversation_demo_22" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_2"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_22_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_22"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 22</field>
+    <field name="date">2023-07-02 06:10:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_22_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_22"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 22</field>
+    <field name="date">2023-07-02 06:20:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_22_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_22"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 22</field>
+    <field name="date">2023-07-02 06:30:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_23" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_3"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_23_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_23"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 23</field>
+    <field name="date">2023-07-02 07:10:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_23_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_23"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 23</field>
+    <field name="date">2023-07-02 07:20:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_23_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_23"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 23</field>
+    <field name="date">2023-07-02 07:30:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_conversation_demo_24" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_4"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_24_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_24"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 24</field>
+    <field name="date">2023-07-02 08:10:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_24_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_24"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 24</field>
+    <field name="date">2023-07-02 08:20:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_24_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_24"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 24</field>
+    <field name="date">2023-07-02 08:30:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_25" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_5"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_25_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_25"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 25</field>
+    <field name="date">2023-07-02 09:10:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_25_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_25"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 25</field>
+    <field name="date">2023-07-02 09:20:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_25_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_25"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 25</field>
+    <field name="date">2023-07-02 09:30:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_conversation_demo_26" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_6"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_26_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_26"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 26</field>
+    <field name="date">2023-07-02 10:10:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_26_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_26"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 26</field>
+    <field name="date">2023-07-02 10:20:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_26_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_26"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 26</field>
+    <field name="date">2023-07-02 10:30:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_27" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_7"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_27_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_27"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 27</field>
+    <field name="date">2023-07-02 11:10:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_27_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_27"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 27</field>
+    <field name="date">2023-07-02 11:20:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_27_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_27"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 27</field>
+    <field name="date">2023-07-02 11:30:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_conversation_demo_28" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_8"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_28_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_28"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 28</field>
+    <field name="date">2023-07-02 12:10:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_28_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_28"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 28</field>
+    <field name="date">2023-07-02 12:20:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_28_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_28"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 28</field>
+    <field name="date">2023-07-02 12:30:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_29" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_9"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_29_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_29"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 29</field>
+    <field name="date">2023-07-02 13:10:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_29_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_29"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 29</field>
+    <field name="date">2023-07-02 13:20:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_29_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_29"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 29</field>
+    <field name="date">2023-07-02 13:30:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_conversation_demo_30" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_10"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_30_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_30"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 30</field>
+    <field name="date">2023-07-02 14:10:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_30_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_30"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 30</field>
+    <field name="date">2023-07-02 14:20:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_30_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_30"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 30</field>
+    <field name="date">2023-07-02 14:30:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_31" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_11"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_31_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_31"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 31</field>
+    <field name="date">2023-07-02 15:10:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_31_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_31"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 31</field>
+    <field name="date">2023-07-02 15:20:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_31_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_31"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 31</field>
+    <field name="date">2023-07-02 15:30:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_conversation_demo_32" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_12"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_32_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_32"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 32</field>
+    <field name="date">2023-07-02 16:10:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_32_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_32"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 32</field>
+    <field name="date">2023-07-02 16:20:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_32_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_32"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 32</field>
+    <field name="date">2023-07-02 16:30:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_33" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_13"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_33_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_33"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 33</field>
+    <field name="date">2023-07-02 17:10:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_33_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_33"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 33</field>
+    <field name="date">2023-07-02 17:20:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_33_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_33"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 33</field>
+    <field name="date">2023-07-02 17:30:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_conversation_demo_34" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_14"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_34_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_34"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 34</field>
+    <field name="date">2023-07-02 18:10:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_34_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_34"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 34</field>
+    <field name="date">2023-07-02 18:20:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_34_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_34"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 34</field>
+    <field name="date">2023-07-02 18:30:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_35" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_15"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_35_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_35"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 35</field>
+    <field name="date">2023-07-02 19:10:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_35_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_35"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 35</field>
+    <field name="date">2023-07-02 19:20:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_35_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_35"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 35</field>
+    <field name="date">2023-07-02 19:30:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_conversation_demo_36" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_16"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_36_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_36"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 36</field>
+    <field name="date">2023-07-02 20:10:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_36_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_36"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 36</field>
+    <field name="date">2023-07-02 20:20:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_36_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_36"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 36</field>
+    <field name="date">2023-07-02 20:30:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_37" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_17"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_37_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_37"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 37</field>
+    <field name="date">2023-07-02 21:10:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_37_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_37"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 37</field>
+    <field name="date">2023-07-02 21:20:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_37_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_37"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 37</field>
+    <field name="date">2023-07-02 21:30:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_conversation_demo_38" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_18"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_38_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_38"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 38</field>
+    <field name="date">2023-07-02 22:10:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_38_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_38"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 38</field>
+    <field name="date">2023-07-02 22:20:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_38_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_38"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 38</field>
+    <field name="date">2023-07-02 22:30:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_39" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_19"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_39_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_39"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 39</field>
+    <field name="date">2023-07-02 23:10:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_39_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_39"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 39</field>
+    <field name="date">2023-07-02 23:20:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_39_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_39"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 39</field>
+    <field name="date">2023-07-02 23:30:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_conversation_demo_40" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_20"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_40_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_40"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 40</field>
+    <field name="date">2023-07-03 00:10:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_40_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_40"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 40</field>
+    <field name="date">2023-07-03 00:20:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_40_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_40"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 40</field>
+    <field name="date">2023-07-03 00:30:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_41" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_1"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_41_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_41"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 41</field>
+    <field name="date">2023-07-03 01:10:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_41_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_41"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 41</field>
+    <field name="date">2023-07-03 01:20:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_41_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_41"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 41</field>
+    <field name="date">2023-07-03 01:30:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_conversation_demo_42" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_2"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_42_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_42"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 42</field>
+    <field name="date">2023-07-03 02:10:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_42_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_42"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 42</field>
+    <field name="date">2023-07-03 02:20:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_42_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_42"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 42</field>
+    <field name="date">2023-07-03 02:30:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_43" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_3"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_43_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_43"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 43</field>
+    <field name="date">2023-07-03 03:10:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_43_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_43"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 43</field>
+    <field name="date">2023-07-03 03:20:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_43_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_43"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 43</field>
+    <field name="date">2023-07-03 03:30:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_conversation_demo_44" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_4"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_44_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_44"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 44</field>
+    <field name="date">2023-07-03 04:10:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_44_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_44"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 44</field>
+    <field name="date">2023-07-03 04:20:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_44_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_44"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 44</field>
+    <field name="date">2023-07-03 04:30:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_45" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_5"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_45_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_45"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 45</field>
+    <field name="date">2023-07-03 05:10:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_45_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_45"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 45</field>
+    <field name="date">2023-07-03 05:20:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_45_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_45"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 45</field>
+    <field name="date">2023-07-03 05:30:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_conversation_demo_46" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_6"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_46_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_46"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 46</field>
+    <field name="date">2023-07-03 06:10:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_46_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_46"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 46</field>
+    <field name="date">2023-07-03 06:20:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_46_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_46"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 46</field>
+    <field name="date">2023-07-03 06:30:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_47" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_7"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_47_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_47"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 47</field>
+    <field name="date">2023-07-03 07:10:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_47_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_47"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 47</field>
+    <field name="date">2023-07-03 07:20:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_47_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_47"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 47</field>
+    <field name="date">2023-07-03 07:30:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_conversation_demo_48" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_8"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_line_demo_48_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_48"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 48</field>
+    <field name="date">2023-07-03 08:10:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_48_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_48"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 48</field>
+    <field name="date">2023-07-03 08:20:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_48_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_48"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 48</field>
+    <field name="date">2023-07-03 08:30:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_conversation_demo_49" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_9"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_line_demo_49_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_49"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 1 for conversation 49</field>
+    <field name="date">2023-07-03 09:10:00</field>
+    <field name="status">delivered</field>
+  </record>
+  <record id="sms_line_demo_49_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_49"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 2 for conversation 49</field>
+    <field name="date">2023-07-03 09:20:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_49_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_49"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 3 for conversation 49</field>
+    <field name="date">2023-07-03 09:30:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_conversation_demo_50" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_10"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_line_demo_50_1" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_50"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 1 for conversation 50</field>
+    <field name="date">2023-07-03 10:10:00</field>
+    <field name="status">failed</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+  <record id="sms_line_demo_50_2" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_50"/>
+    <field name="direction">in</field>
+    <field name="body">Demo message 2 for conversation 50</field>
+    <field name="date">2023-07-03 10:20:00</field>
+    <field name="status">draft</field>
+  </record>
+  <record id="sms_line_demo_50_3" model="sms.conversation.line">
+    <field name="conversation_id" ref="sms_conversation_demo_50"/>
+    <field name="direction">out</field>
+    <field name="body">Demo message 3 for conversation 50</field>
+    <field name="date">2023-07-03 10:30:00</field>
+    <field name="status">sent</field>
+    <field name="user_id" ref="base.user_admin"/>
+  </record>
+</odoo>

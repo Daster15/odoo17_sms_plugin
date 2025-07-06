@@ -1,0 +1,15 @@
+<odoo>
+  <template id="sms_report_summary">
+    <t t-call="web.external_layout">
+      <div class="page">
+        <h2>SMS Summary Report</h2>
+        <p>Date from: <span t-esc="doc.date_from"/> to <span t-esc="doc.date_to"/></p>
+        <table class="table table-sm">
+          <tr><th>Total</th><td><span t-esc="doc.total"/></td></tr>
+          <tr><th>Sent</th><td><span t-esc="doc.sent"/></td></tr>
+          <tr><th>Failed</th><td><span t-esc="doc.failed"/></td></tr>
+        </table>
+      </div>
+    </t>
+  </template>
+</odoo>

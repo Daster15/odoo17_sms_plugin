@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="1">
+    <!-- SMS Templates -->
+    <record id="sms_template_promo" model="sms.template">
+      <field name="name">Promotion Template</field>
+      <field name="body">Special promotion just for you! Use code PROMO20 for 20% off.</field>
+    </record>
+    <record id="sms_template_alert" model="sms.template">
+      <field name="name">Alert Template</field>
+      <field name="body">Urgent: Your order is ready for pickup. Store open until 8PM.</field>
+    </record>
+    <record id="sms_template_notification" model="sms.template">
+      <field name="name">Notification Template</field>
+      <field name="body">Reminder: Your appointment is tomorrow at 10:00 AM.</field>
+    </record>
+
+    <!-- Demo SMS Messages -->
+    <!-- Draft messages -->
+    <record id="demo_sms_1" model="sms.message">
+      <field name="body">Welcome to our service! Start saving today.</field>
+      <field name="partner_id" ref="demo_partner_1"/>
+      <field name="state">draft</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48123456789</field>
+    </record>
+    <record id="demo_sms_2" model="sms.message">
+      <field name="template_id" ref="sms_template_promo"/>
+      <field name="partner_id" ref="demo_partner_2"/>
+      <field name="state">draft</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48987654321</field>
+    </record>
+
+    <!-- Scheduled messages -->
+    <record id="demo_sms_3" model="sms.message">
+      <field name="body">Your monthly newsletter with special offers inside!</field>
+      <field name="partner_id" ref="demo_partner_3"/>
+      <field name="state">scheduled</field>
+      <field name="date_scheduled">2025-03-01 09:00:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48123456789</field>
+    </record>
+    <record id="demo_sms_4" model="sms.message">
+      <field name="template_id" ref="sms_template_alert"/>
+      <field name="group_ids" eval="[(6, 0, [ref('demo_partner_4'), ref('demo_partner_5')])]"/>
+      <field name="state">scheduled</field>
+      <field name="date_scheduled">2025-03-15 14:30:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48111222333</field>
+    </record>
+
+    <!-- Sent messages -->
+    <record id="demo_sms_5" model="sms.message">
+      <field name="body">Your order #12345 has been shipped!</field>
+      <field name="partner_id" ref="demo_partner_6"/>
+      <field name="state">sent</field>
+      <field name="date_scheduled">2025-01-05 11:15:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48123456789</field>
+      <field name="external_id">EXT12345</field>
+    </record>
+    <record id="demo_sms_6" model="sms.message">
+      <field name="template_id" ref="sms_template_notification"/>
+      <field name="partner_id" ref="demo_partner_7"/>
+      <field name="state">sent</field>
+      <field name="date_scheduled">2025-02-20 08:00:00</field>
+      <field name="message_type">notification</field>
+      <field name="sender_number">+48987654321</field>
+      <field name="external_id">EXT12346</field>
+    </record>
+
+    <!-- Delivered messages -->
+    <record id="demo_sms_7" model="sms.message">
+      <field name="body">Thank you for your purchase! Your invoice is attached.</field>
+      <field name="partner_id" ref="demo_partner_8"/>
+      <field name="state">delivered</field>
+      <field name="date_scheduled">2025-01-10 13:45:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48111222333</field>
+      <field name="external_id">EXT12347</field>
+    </record>
+    <record id="demo_sms_8" model="sms.message">
+      <field name="template_id" ref="sms_template_promo"/>
+      <field name="group_ids" eval="[(6, 0, [ref('demo_partner_9'), ref('demo_partner_10')])]"/>
+      <field name="state">delivered</field>
+      <field name="date_scheduled">2025-02-05 10:30:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48123456789</field>
+      <field name="external_id">EXT12348</field>
+    </record>
+
+    <!-- Failed messages -->
+    <record id="demo_sms_9" model="sms.message">
+      <field name="body">Your subscription is about to expire. Renew now!</field>
+      <field name="partner_id" ref="demo_partner_11"/>
+      <field name="state">failed</field>
+      <field name="date_scheduled">2025-01-15 16:20:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48987654321</field>
+      <field name="external_id">EXT12349</field>
+    </record>
+    <record id="demo_sms_10" model="sms.message">
+      <field name="template_id" ref="sms_template_alert"/>
+      <field name="partner_id" ref="demo_partner_12"/>
+      <field name="state">failed</field>
+      <field name="date_scheduled">2025-02-28 09:15:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48111222333</field>
+      <field name="external_id">EXT12350</field>
+    </record>
+
+    <!-- Additional messages to reach 30+ records -->
+    <!-- Draft -->
+    <record id="demo_sms_11" model="sms.message">
+      <field name="body">New products just arrived! Check our store.</field>
+      <field name="partner_id" ref="demo_partner_1"/>
+      <field name="state">draft</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48987654321</field>
+    </record>
+    <record id="demo_sms_12" model="sms.message">
+      <field name="template_id" ref="sms_template_notification"/>
+      <field name="partner_id" ref="demo_partner_2"/>
+      <field name="state">draft</field>
+      <field name="message_type">notification</field>
+      <field name="sender_number">+48123456789</field>
+    </record>
+    <record id="demo_sms_13" model="sms.message">
+      <field name="body">We miss you! Come back and get 15% off.</field>
+      <field name="group_ids" eval="[(6, 0, [ref('demo_partner_3'), ref('demo_partner_4')])]"/>
+      <field name="state">draft</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48111222333</field>
+    </record>
+
+    <!-- Scheduled -->
+    <record id="demo_sms_14" model="sms.message">
+      <field name="template_id" ref="sms_template_promo"/>
+      <field name="partner_id" ref="demo_partner_5"/>
+      <field name="state">scheduled</field>
+      <field name="date_scheduled">2025-03-10 12:00:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48987654321</field>
+    </record>
+    <record id="demo_sms_15" model="sms.message">
+      <field name="body">Your feedback is important to us. Please rate your experience.</field>
+      <field name="partner_id" ref="demo_partner_6"/>
+      <field name="state">scheduled</field>
+      <field name="date_scheduled">2025-03-12 15:30:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48123456789</field>
+    </record>
+    <record id="demo_sms_16" model="sms.message">
+      <field name="template_id" ref="sms_template_alert"/>
+      <field name="group_ids" eval="[(6, 0, [ref('demo_partner_7'), ref('demo_partner_8')])]"/>
+      <field name="state">scheduled</field>
+      <field name="date_scheduled">2025-03-20 10:00:00</field>
+      <field name="message_type">notification</field>
+      <field name="sender_number">+48111222333</field>
+    </record>
+
+    <!-- Sent -->
+    <record id="demo_sms_17" model="sms.message">
+      <field name="body">Your account has been credited with 100 bonus points!</field>
+      <field name="partner_id" ref="demo_partner_9"/>
+      <field name="state">sent</field>
+      <field name="date_scheduled">2025-01-20 09:45:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48987654321</field>
+      <field name="external_id">EXT12351</field>
+    </record>
+    <record id="demo_sms_18" model="sms.message">
+      <field name="template_id" ref="sms_template_notification"/>
+      <field name="partner_id" ref="demo_partner_10"/>
+      <field name="state">sent</field>
+      <field name="date_scheduled">2025-02-15 14:00:00</field>
+      <field name="message_type">notification</field>
+      <field name="sender_number">+48123456789</field>
+      <field name="external_id">EXT12352</field>
+    </record>
+    <record id="demo_sms_19" model="sms.message">
+      <field name="body">System maintenance scheduled for tomorrow 2AM-4AM.</field>
+      <field name="group_ids" eval="[(6, 0, [ref('demo_partner_11'), ref('demo_partner_12')])]"/>
+      <field name="state">sent</field>
+      <field name="date_scheduled">2025-01-25 17:30:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48111222333</field>
+      <field name="external_id">EXT12353</field>
+    </record>
+
+    <!-- Delivered -->
+    <record id="demo_sms_20" model="sms.message">
+      <field name="template_id" ref="sms_template_promo"/>
+      <field name="partner_id" ref="demo_partner_1"/>
+      <field name="state">delivered</field>
+      <field name="date_scheduled">2025-01-30 11:00:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48987654321</field>
+      <field name="external_id">EXT12354</field>
+    </record>
+    <record id="demo_sms_21" model="sms.message">
+      <field name="body">Your password has been successfully changed.</field>
+      <field name="partner_id" ref="demo_partner_2"/>
+      <field name="state">delivered</field>
+      <field name="date_scheduled">2025-02-22 08:15:00</field>
+      <field name="message_type">notification</field>
+      <field name="sender_number">+48123456789</field>
+      <field name="external_id">EXT12355</field>
+    </record>
+    <record id="demo_sms_22" model="sms.message">
+      <field name="template_id" ref="sms_template_alert"/>
+      <field name="group_ids" eval="[(6, 0, [ref('demo_partner_3'), ref('demo_partner_4')])]"/>
+      <field name="state">delivered</field>
+      <field name="date_scheduled">2025-01-18 13:00:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48111222333</field>
+      <field name="external_id">EXT12356</field>
+    </record>
+
+    <!-- Failed -->
+    <record id="demo_sms_23" model="sms.message">
+      <field name="body">Your subscription renewal failed. Please update payment method.</field>
+      <field name="partner_id" ref="demo_partner_5"/>
+      <field name="state">failed</field>
+      <field name="date_scheduled">2025-02-05 16:45:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48987654321</field>
+      <field name="external_id">EXT12357</field>
+    </record>
+    <record id="demo_sms_24" model="sms.message">
+      <field name="template_id" ref="sms_template_notification"/>
+      <field name="partner_id" ref="demo_partner_6"/>
+      <field name="state">failed</field>
+      <field name="date_scheduled">2025-01-22 10:30:00</field>
+      <field name="message_type">notification</field>
+      <field name="sender_number">+48123456789</field>
+      <field name="external_id">EXT12358</field>
+    </record>
+    <record id="demo_sms_25" model="sms.message">
+      <field name="body">Delivery attempt failed. Please contact customer service.</field>
+      <field name="group_ids" eval="[(6, 0, [ref('demo_partner_7'), ref('demo_partner_8')])]"/>
+      <field name="state">failed</field>
+      <field name="date_scheduled">2025-02-18 14:15:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48111222333</field>
+      <field name="external_id">EXT12359</field>
+    </record>
+
+    <!-- More variations -->
+    <record id="demo_sms_26" model="sms.message">
+      <field name="body">Limited time offer: 50% off all summer collection!</field>
+      <field name="partner_id" ref="demo_partner_9"/>
+      <field name="state">sent</field>
+      <field name="date_scheduled">2025-03-05 09:30:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48987654321</field>
+      <field name="external_id">EXT12360</field>
+    </record>
+    <record id="demo_sms_27" model="sms.message">
+      <field name="template_id" ref="sms_template_promo"/>
+      <field name="partner_id" ref="demo_partner_10"/>
+      <field name="state">delivered</field>
+      <field name="date_scheduled">2025-02-25 11:45:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48123456789</field>
+      <field name="external_id">EXT12361</field>
+    </record>
+    <record id="demo_sms_28" model="sms.message">
+      <field name="body">Your support ticket has been resolved. Thank you!</field>
+      <field name="group_ids" eval="[(6, 0, [ref('demo_partner_11'), ref('demo_partner_12')])]"/>
+      <field name="state">failed</field>
+      <field name="date_scheduled">2025-01-28 15:00:00</field>
+      <field name="message_type">notification</field>
+      <field name="sender_number">+48111222333</field>
+      <field name="external_id">EXT12362</field>
+    </record>
+    <record id="demo_sms_29" model="sms.message">
+      <field name="template_id" ref="sms_template_alert"/>
+      <field name="partner_id" ref="demo_partner_1"/>
+      <field name="state">scheduled</field>
+      <field name="date_scheduled">2025-03-25 16:30:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48987654321</field>
+    </record>
+    <record id="demo_sms_30" model="sms.message">
+      <field name="body">Your loyalty points are about to expire. Use them now!</field>
+      <field name="partner_id" ref="demo_partner_2"/>
+      <field name="state">draft</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48123456789</field>
+    </record>
+    <record id="demo_sms_31" model="sms.message">
+      <field name="template_id" ref="sms_template_notification"/>
+      <field name="group_ids" eval="[(6, 0, [ref('demo_partner_3'), ref('demo_partner_4')])]"/>
+      <field name="state">delivered</field>
+      <field name="date_scheduled">2025-02-08 10:00:00</field>
+      <field name="message_type">notification</field>
+      <field name="sender_number">+48111222333</field>
+      <field name="external_id">EXT12363</field>
+    </record>
+    <record id="demo_sms_32" model="sms.message">
+      <field name="body">New security alert: Please change your password.</field>
+      <field name="partner_id" ref="demo_partner_5"/>
+      <field name="state">failed</field>
+      <field name="date_scheduled">2025-01-12 12:30:00</field>
+      <field name="message_type">sms</field>
+      <field name="sender_number">+48987654321</field>
+      <field name="external_id">EXT12364</field>
+    </record>
+  </data>
+</odoo>

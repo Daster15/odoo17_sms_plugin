@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- 1. Pomocnicze akcje dla przycisków statystyk -->
+  <record id="action_open_messages" model="ir.actions.act_window">
+    <field name="name">All Messages</field>
+    <field name="res_model">sms.message</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('campaign_id','=',active_id)]</field>
+  </record>
+  <record id="action_open_sent" model="ir.actions.act_window">
+    <field name="name">Sent Messages</field>
+    <field name="res_model">sms.message</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('campaign_id','=',active_id),('state','in',['sent','delivered'])]</field>
+  </record>
+  <record id="action_open_delivered" model="ir.actions.act_window">
+    <field name="name">Delivered Messages</field>
+    <field name="res_model">sms.message</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('campaign_id','=',active_id),('state','=','delivered')]</field>
+  </record>
+  <record id="action_open_failed" model="ir.actions.act_window">
+    <field name="name">Failed Messages</field>
+    <field name="res_model">sms.message</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('campaign_id','=',active_id),('state','=','failed')]</field>
+  </record>
+  <record id="action_open_pending" model="ir.actions.act_window">
+    <field name="name">Pending Messages</field>
+    <field name="res_model">sms.message</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('campaign_id','=',active_id),('state','in',['sent','error_retry'])]</field>
+  </record>
+
+  <!-- 2. Główna akcja -->
+  <record id="action_sms_campaign" model="ir.actions.act_window">
+    <field name="name">SMS Campaigns</field>
+    <field name="res_model">sms.campaign</field>
+    <field name="view_mode">tree,form,kanban</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">
+        <div>Create a new SMS campaign to start sending messages to your contacts.</div>
+      </p>
+    </field>
+    <field name="context">{'search_default_groupby_state': 1}</field>
+  </record>
+
+  <!-- 3. Menu kampanii (bez zmian) -->
+  <menuitem
+    id="menu_sms_campaigns"
+    name="Campaigns"
+    parent="odoo17_sms_plugin.menu_sms_root"
+    action="action_sms_campaign"
+    sequence="20"/>
+
+  <!-- 4. Widok Kanban -->
+  <record id="view_sms_campaign_kanban" model="ir.ui.view">
+    <field name="name">sms.campaign.kanban</field>
+    <field name="model">sms.campaign</field>
+    <field name="arch" type="xml">
+      <kanban default_group_by="state" class="o_kanban_sms_campaign">
+        <field name="state"/>
+        <field name="name"/>
+        <field name="date_start"/>
+        <field name="date_end"/>
+        <field name="message_count"/>
+        <field name="sent_count"/>
+        <field name="delivered_count"/>
+        <field name="failed_count"/>
+        <field name="pending_count"/>
+        <templates>
+          <t t-name="kanban-box">
+            <div class="oe_kanban_global_click o_kanban_record">
+              <div class="o_kanban_card_header">
+                <field name="state" widget="badge" class="float-right"/>
+                <h3><field name="name"/></h3>
+              </div>
+              <div class="o_kanban_card_content">
+                <div class="row mb8">
+                  <div class="col-6">
+                    <small>Start:</small>
+                    <field name="date_start" widget="date"/>
+                  </div>
+                  <div class="col-6">
+                    <small>End:</small>
+                    <field name="date_end" widget="date"/>
+                  </div>
+                </div>
+                <div class="progress mb0 mt8"
+                     invisible="not message_count or message_count &lt;= 0">
+                  <div class="progress-bar bg-success" role="progressbar"
+                       style="width: #{record.delivered_count.value/record.message_count.value*100 if record.message_count.value else 0}%"/>
+                  <div class="progress-bar bg-warning" role="progressbar"
+                       style="width: #{(record.sent_count.value-record.delivered_count.value)/record.message_count.value*100 if record.message_count.value else 0}%"/>
+                  <div class="progress-bar bg-danger" role="progressbar"
+                       style="width: #{record.failed_count.value/record.message_count.value*100 if record.message_count.value else 0}%"/>
+                </div>
+              </div>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+
+  <!-- 5. Widok Tree -->
+  <record id="view_sms_campaign_tree" model="ir.ui.view">
+    <field name="name">sms.campaign.tree</field>
+    <field name="model">sms.campaign</field>
+    <field name="arch" type="xml">
+      <tree decoration-success="state == 'done'" decoration-danger="state == 'cancelled'">
+        <field name="name" widget="handle"/>
+        <field name="state" widget="badge"/>
+        <field name="date_start"/>
+        <field name="date_end"/>
+        <field name="message_count" string="Total" widget="statinfo"/>
+        <field name="sent_count" string="Sent" widget="statinfo"/>
+        <field name="delivered_count" string="Delivered" widget="statinfo"/>
+        <field name="pending_count" string="Pending" widget="statinfo"/>
+        <field name="delivery_rate" widget="percentage"/>
+      </tree>
+    </field>
+  </record>
+
+  <!-- 6. Widok Form -->
+  <record id="view_sms_campaign_form" model="ir.ui.view">
+    <field name="name">sms.campaign.form</field>
+    <field name="model">sms.campaign</field>
+    <field name="arch" type="xml">
+      <form string="SMS Campaign">
+        <header>
+          <field name="state" widget="statusbar"
+                 statusbar_visible="draft,running,done,cancelled"/>
+        </header>
+        <sheet>
+          <div class="oe_button_box" name="button_box">
+            <button type="action"
+                    name="%(odoo17_sms_plugin.action_open_messages)d"
+                    class="oe_stat_button" icon="fa-envelope">
+              <field name="message_count" string="Total" widget="statinfo"/>
+            </button>
+            <button type="action"
+                    name="%(odoo17_sms_plugin.action_open_sent)d"
+                    class="oe_stat_button" icon="fa-paper-plane">
+              <field name="sent_count" string="Sent" widget="statinfo"/>
+            </button>
+            <button type="action"
+                    name="%(odoo17_sms_plugin.action_open_delivered)d"
+                    class="oe_stat_button" icon="fa-check-circle">
+              <field name="delivered_count" string="Delivered" widget="statinfo"/>
+            </button>
+            <button type="action"
+                    name="%(odoo17_sms_plugin.action_open_failed)d"
+                    class="oe_stat_button" icon="fa-exclamation-triangle">
+              <field name="failed_count" string="Failed" widget="statinfo"/>
+            </button>
+            <button type="action"
+                    name="%(odoo17_sms_plugin.action_open_pending)d"
+                    class="oe_stat_button" icon="fa-hourglass-start"
+                    groups="base.group_user">
+              <field name="pending_count" string="Pending" widget="statinfo"/>
+            </button>
+          </div>
+
+          <group>
+            <group>
+              <field name="name"/>
+            </group>
+            <group>
+              <field name="date_start" widget="datetime"/>
+              <field name="date_end" widget="datetime"/>
+            </group>
+          </group>
+
+          <div class="row mt16">
+            <div class="col-12 col-lg-6">
+              <div class="o_box">
+                <h4 class="text-center">Delivery Status</h4>
+                <div invisible="not message_count or message_count &lt;= 0">
+                  <div class="progress" style="height: 20px;">
+                    <div class="progress-bar bg-success"
+                         style="width: #{delivered_count/message_count*100 if message_count else 0}%"/>
+                    <div class="progress-bar bg-warning"
+                         style="width: #{(sent_count-delivered_count)/message_count*100 if message_count else 0}%"/>
+                    <div class="progress-bar bg-danger"
+                         style="width: #{failed_count/message_count*100 if message_count else 0}%"/>
+                  </div>
+                  <div class="row mt8 text-center">
+                    <div class="col-4">
+                      <span class="fa fa-circle text-success"/>
+                      <field name="delivered_count"/> Delivered
+                    </div>
+                    <div class="col-4">
+                      <span class="fa fa-circle text-warning"/>
+                      <field name="pending_count"/> Pending
+                    </div>
+                    <div class="col-4">
+                      <span class="fa fa-circle text-danger"/>
+                      <field name="failed_count"/> Failed
+                    </div>
+                  </div>
+                </div>
+                <div invisible="message_count and message_count &gt; 0"
+                     class="text-center text-muted">
+                  No messages yet
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6">
+              <div class="o_box">
+                <h4 class="text-center">Delivery Rate</h4>
+                <div invisible="not message_count or message_count &lt;= 0" class="text-center">
+                  <div style="font-size: 48px; color: #{'#4CAF50' if delivery_rate &gt; 80 else '#FFC107' if delivery_rate &gt; 50 else '#F44336'};">
+                    <field name="delivery_rate"/>%
+                  </div>
+                  <div>
+                    <field name="delivered_count"/> of <field name="message_count"/> delivered
+                  </div>
+                </div>
+                <div invisible="message_count and message_count &gt; 0"
+                     class="text-center text-muted">
+                  No messages yet
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <notebook>
+            <page string="Messages">
+              <field name="message_ids" context="{'default_campaign_id': active_id}">
+                <tree editable="bottom">
+                  <field name="partner_id" widget="many2one_avatar"/>
+                  <field name="body"/>
+                  <field name="date_scheduled" widget="datetime"/>
+                  <field name="state" widget="badge"/>
+                </tree>
+              </field>
+            </page>
+            <page string="Statistics" groups="base.group_user">
+              <group>
+                <field name="message_count" readonly="1"/>
+                <field name="scheduled_count" readonly="1"/>
+                <field name="sent_count" readonly="1"/>
+                <field name="delivered_count" readonly="1"/>
+                <field name="failed_count" readonly="1"/>
+                <field name="pending_count" readonly="1"/>
+                <field name="delivery_rate" readonly="1"/>
+              </group>
+            </page>
+          </notebook>
+        </sheet>
+        <footer>
+          <button name="action_start" type="object" string="Start Campaign"
+                  class="btn-primary" invisible="state!='draft'" confirm="Are you sure?"/>
+          <button name="action_stop" type="object" string="Stop Campaign"
+                  class="btn-danger" invisible="state!='running'" confirm="Are you sure?"/>
+          <button name="action_cancel" type="object" string="Cancel Campaign"
+                  class="btn-secondary" invisible="state in ['done','cancelled']"/>
+          <button name="action_retry_failed" type="object" string="Retry Failed"
+                  class="btn-warning"
+                  invisible="not failed_count or failed_count&lt;=0 or state!='running'"/>
+          <button string="Close" class="btn-secondary" special="cancel"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+</odoo>

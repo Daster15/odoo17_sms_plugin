@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="res_partner_demo_1" model="res.partner">
+    <field name="name">Demo Partner 1</field>
+    <field name="phone">+48070000001</field>
+  </record>
+  <record id="res_partner_demo_2" model="res.partner">
+    <field name="name">Demo Partner 2</field>
+    <field name="phone">+48070000002</field>
+  </record>
+  <record id="res_partner_demo_3" model="res.partner">
+    <field name="name">Demo Partner 3</field>
+    <field name="phone">+48070000003</field>
+  </record>
+  <record id="res_partner_demo_4" model="res.partner">
+    <field name="name">Demo Partner 4</field>
+    <field name="phone">+48070000004</field>
+  </record>
+  <record id="res_partner_demo_5" model="res.partner">
+    <field name="name">Demo Partner 5</field>
+    <field name="phone">+48070000005</field>
+  </record>
+  <record id="res_partner_demo_6" model="res.partner">
+    <field name="name">Demo Partner 6</field>
+    <field name="phone">+48070000006</field>
+  </record>
+  <record id="res_partner_demo_7" model="res.partner">
+    <field name="name">Demo Partner 7</field>
+    <field name="phone">+48070000007</field>
+  </record>
+  <record id="res_partner_demo_8" model="res.partner">
+    <field name="name">Demo Partner 8</field>
+    <field name="phone">+48070000008</field>
+  </record>
+  <record id="res_partner_demo_9" model="res.partner">
+    <field name="name">Demo Partner 9</field>
+    <field name="phone">+48070000009</field>
+  </record>
+  <record id="res_partner_demo_10" model="res.partner">
+    <field name="name">Demo Partner 10</field>
+    <field name="phone">+48070000010</field>
+  </record>
+  <record id="res_partner_demo_11" model="res.partner">
+    <field name="name">Demo Partner 11</field>
+    <field name="phone">+48070000011</field>
+  </record>
+  <record id="res_partner_demo_12" model="res.partner">
+    <field name="name">Demo Partner 12</field>
+    <field name="phone">+48070000012</field>
+  </record>
+  <record id="res_partner_demo_13" model="res.partner">
+    <field name="name">Demo Partner 13</field>
+    <field name="phone">+48070000013</field>
+  </record>
+  <record id="res_partner_demo_14" model="res.partner">
+    <field name="name">Demo Partner 14</field>
+    <field name="phone">+48070000014</field>
+  </record>
+  <record id="res_partner_demo_15" model="res.partner">
+    <field name="name">Demo Partner 15</field>
+    <field name="phone">+48070000015</field>
+  </record>
+  <record id="res_partner_demo_16" model="res.partner">
+    <field name="name">Demo Partner 16</field>
+    <field name="phone">+48070000016</field>
+  </record>
+  <record id="res_partner_demo_17" model="res.partner">
+    <field name="name">Demo Partner 17</field>
+    <field name="phone">+48070000017</field>
+  </record>
+  <record id="res_partner_demo_18" model="res.partner">
+    <field name="name">Demo Partner 18</field>
+    <field name="phone">+48070000018</field>
+  </record>
+  <record id="res_partner_demo_19" model="res.partner">
+    <field name="name">Demo Partner 19</field>
+    <field name="phone">+48070000019</field>
+  </record>
+  <record id="res_partner_demo_20" model="res.partner">
+    <field name="name">Demo Partner 20</field>
+    <field name="phone">+48070000020</field>
+  </record>
+  <record id="sms_conversation_demo_1" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_1"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_2" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_2"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_3" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_3"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_4" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_4"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_5" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_5"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_6" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_6"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_7" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_7"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_8" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_8"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_9" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_9"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_10" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_10"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_11" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_11"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_12" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_12"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_13" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_13"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_14" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_14"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_15" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_15"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_16" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_16"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_17" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_17"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_18" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_18"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_19" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_19"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_20" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_20"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_21" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_1"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_22" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_2"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_23" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_3"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_24" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_4"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_25" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_5"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_26" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_6"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_27" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_7"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_28" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_8"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_29" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_9"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_30" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_10"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_31" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_11"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_32" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_12"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_33" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_13"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_34" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_14"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_35" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_15"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_36" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_16"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_37" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_17"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_38" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_18"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_39" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_19"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_40" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_20"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_41" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_1"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_42" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_2"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_43" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_3"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_44" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_4"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_45" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_5"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_46" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_6"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_47" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_7"/>
+    <field name="state">spam</field>
+  </record>
+  <record id="sms_conversation_demo_48" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_8"/>
+    <field name="state">active</field>
+  </record>
+  <record id="sms_conversation_demo_49" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_9"/>
+    <field name="state">closed</field>
+  </record>
+  <record id="sms_conversation_demo_50" model="sms.conversation">
+    <field name="partner_id" ref="res_partner_demo_10"/>
+    <field name="state">spam</field>
+  </record>
+</odoo>

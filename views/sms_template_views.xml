@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="action_sms_template" model="ir.actions.act_window">
+    <field name="name">SMS Templates</field>
+    <field name="res_model">sms.template</field>
+    <field name="view_mode">tree,form,kanban</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">
+        <div>Click "New" to create a new SMS template.</div>
+      </p>
+    </field>
+  </record>
+
+  <menuitem id="menu_sms_templates" name="Templates"
+            parent="menu_sms_root" action="action_sms_template" sequence="40"/>
+
+  <!-- Tree View -->
+  <record id="view_sms_template_tree" model="ir.ui.view">
+    <field name="name">sms.template.tree</field>
+    <field name="model">sms.template</field>
+    <field name="arch" type="xml">
+      <tree string="SMS Templates">
+        <field name="name" string="Template Name"/>
+        <field name="model_id" string="Applies to"/>
+        <field name="body" string="Message Content" widget="text"/>
+      </tree>
+    </field>
+  </record>
+
+  <!-- Form View -->
+  <record id="view_sms_template_form" model="ir.ui.view">
+    <field name="name">sms.template.form</field>
+    <field name="model">sms.template</field>
+    <field name="arch" type="xml">
+      <form string="SMS Template">
+        <header>
+          <field name="active" widget="boolean_button"/>
+        </header>
+        <sheet>
+          <div class="oe_title">
+            <h1><field name="name" placeholder="Template Name"/></h1>
+          </div>
+
+          <group>
+            <group>
+              <field name="model_id" string="Applies to"/>
+              <field name="lang" string="Language"/>
+            </group>
+            <group>
+              <field name="active"/>
+              <field name="default" string="Default Template"/>
+            </group>
+          </group>
+
+          <group string="Message Content">
+            <field name="body" placeholder="Enter your SMS message here..." nolabel="1"/>
+            <div class="alert alert-info" role="alert">
+              <strong>Tip:</strong> Use variables like ${object.name} for dynamic content.
+            </div>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <!-- Kanban View -->
+  <record id="view_sms_template_kanban" model="ir.ui.view">
+    <field name="name">sms.template.kanban</field>
+    <field name="model">sms.template</field>
+    <field name="arch" type="xml">
+      <kanban>
+        <templates>
+          <t t-name="kanban-box">
+            <div class="oe_kanban_global_click">
+              <div class="o_kanban_record_title">
+                <field name="name"/>
+              </div>
+              <div t-if="record.body.raw_value">
+                <div t-esc="record.body.raw_value.substring(0, 50) + (record.body.raw_value.length > 50 ? '...' : '')"/>
+              </div>
+              <div>
+                <field name="model_id" widget="many2one_tags"/>
+              </div>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+</odoo>

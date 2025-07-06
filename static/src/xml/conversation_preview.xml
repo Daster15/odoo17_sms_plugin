@@ -1,0 +1,31 @@
+<templates xml:space="preserve">
+  <t t-name="ConversationPreviewWidget">
+    <div class="o_conversation_preview">
+      <t t-if="!records.length">
+        <span class="text-muted"><t t-esc="_t('No messages')"/></span>
+      </t>
+      <t t-else="">
+        <t t-foreach="toDisplay" t-as="rec" t-key="rec.id">
+          <div class="o_conversation_line d-flex align-items-center">
+            <t t-if="rec.data[directionField]">
+              <i t-att-class="getIconClass(rec)" class="me-2"/>
+            </t>
+            <t t-if="rec.data[dateField]">
+              <small class="o_conversation_time text-muted me-2">
+                <t t-esc="formatTime(rec)"/>
+              </small>
+            </t>
+            <span class="o_conversation_text flex-grow-1">
+              <t t-esc="getText(rec)"/>
+            </span>
+          </div>
+        </t>
+        <t t-if="moreCount > 0">
+          <div class="o_conversation_more text-muted mt-1">
+            <t t-esc="'+' + moreCount + ' ' + _t('more')"/>
+          </div>
+        </t>
+      </t>
+    </div>
+  </t>
+</templates>

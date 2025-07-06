@@ -1,0 +1,21 @@
+from odoo import models, fields, api
+
+class SmsCampaign(models.Model):
+    _name = 'sms.campaign'
+    _description = 'SMS Campaign'
+
+    name = fields.Char(string='Campaign Name', required=True)
+    message_ids = fields.One2many('sms.message', 'campaign_id', string='Messages')
+    date_start = fields.Date(string='Start Date')
+    date_end = fields.Date(string='End Date')
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('running', 'Running'),
+        ('done', 'Done')
+    ], default='draft')
+
+    def action_start(self):
+        self.state = 'running'
+
+    def action_stop(self):
+        self.state = 'done'

@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Akcja okna + menu -->
+  <record id="action_sms_message" model="ir.actions.act_window">
+    <field name="name">Wiadomości SMS</field>
+    <field name="res_model">sms.message</field>
+    <field name="view_mode">kanban,tree,form,graph</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">Zarządzaj wysyłką wiadomości SMS</p>
+    </field>
+  </record>
+
+  <menuitem id="menu_sms_root" name="Platforma SMS" sequence="10"/>
+  <menuitem id="menu_sms_messages" name="Wiadomości"
+            parent="menu_sms_root" action="action_sms_message" sequence="10"/>
+
+  <!-- Widok kanban z pełną stylizacją -->
+  <record id="view_sms_message_kanban" model="ir.ui.view">
+    <field name="name">sms.message.kanban</field>
+    <field name="model">sms.message</field>
+    <field name="priority" eval="10"/>
+    <field name="arch" type="xml">
+      <kanban default_group_by="state" class="o_sms_kanban">
+        <!-- Dashboard statystyk -->
+        <templates>
+          <t t-name="kanban-statistics">
+            <div class="container-fluid mb-4">
+              <div class="row">
+                <!-- Total Messages -->
+                <div class="col-md-3">
+                  <div class="card bg-light">
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Wszystkie SMS</h5>
+                      <h3 class="card-text">
+                        <t t-esc="widget.model.searchCount([])"/>
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Draft Messages -->
+                <div class="col-md-2">
+                  <div class="card bg-light">
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Wersje robocze</h5>
+                      <h3 class="card-text">
+                        <t t-esc="widget.model.searchCount([('state','=','draft')])"/>
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Scheduled Messages -->
+                <div class="col-md-2">
+                  <div class="card bg-light">
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Zaplanowane</h5>
+                      <h3 class="card-text">
+                        <t t-esc="widget.model.searchCount([('state','=','scheduled')])"/>
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sent Messages -->
+                <div class="col-md-2">
+                  <div class="card bg-light">
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Wysłane</h5>
+                      <h3 class="card-text">
+                        <t t-esc="widget.model.searchCount([('state','=','sent')])"/>
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Delivered Messages -->
+                <div class="col-md-2">
+                  <div class="card bg-light">
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Dostarczone</h5>
+                      <h3 class="card-text">
+                        <t t-esc="widget.model.searchCount([('state','=','delivered')])"/>
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Failed Messages -->
+                <div class="col-md-1">
+                  <div class="card bg-light">
+                    <div class="card-body text-center">
+                      <h5 class="card-title">Błędy</h5>
+                      <h3 class="card-text">
+                        <t t-esc="widget.model.searchCount([('state','=','failed')])"/>
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </t>
+        </templates>
+
+        <field name="id"/>
+        <field name="partner_id"/>
+        <field name="body"/>
+        <field name="char_count"/>
+        <field name="state"/>
+        <field name="date_scheduled"/>
+        <templates>
+          <t t-call="kanban-statistics"/>
+
+          <t t-name="kanban-box">
+            <div class="oe_kanban_card o_kanban_record position-relative o_kanban_card_sms" t-att-class="'o_kanban_state_' + record.state.raw_value" style="min-width: 300px;">
+              <!-- Nagłówek karty -->
+              <div class="o_kanban_primary d-flex align-items-center p-3">
+                <div class="oe_kanban_avatar me-3">
+                  <img t-att-src="'/web/image/res.partner/' + record.partner_id.raw_value + '/image_128'"
+                       class="rounded-circle border"
+                       width="48"
+                       height="48"
+                       alt="Avatar"
+                       t-att-title="record.partner_id.raw_value ? record.partner_id.raw_value[1] : ''"
+                       t-att-onerror="'this.onerror=null;this.src=\'/web/static/img/avatar.png\''"/>
+                </div>
+                <div class="flex-grow-1" style="min-width: 0;">
+                  <strong class="o_kanban_record_title d-block text-truncate">
+                    <field name="partner_id"/>
+                  </strong>
+                  <div class="o_kanban_record_subtitle text-muted small text-truncate">
+                    <i class="fa fa-clock-o me-1"></i>
+                    <field name="date_scheduled" widget="date"/>
+                  </div>
+                </div>
+                <div t-att-class="'badge o_state_badge o_state_' + record.state.raw_value">
+                  <field name="state"/>
+                </div>
+              </div>
+
+              <!-- Treść karty -->
+              <div class="oe_kanban_content px-3 pb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="badge bg-light text-dark">
+                    <i class="fa fa-font me-1"></i>
+                    <field name="char_count"/> znaków
+                  </span>
+                  <t t-if="record.state.raw_value === 'sent'">
+                    <span class="badge bg-success">
+                      <i class="fa fa-check me-1"></i> Wysłano
+                    </span>
+                  </t>
+                  <t t-if="record.state.raw_value === 'failed'">
+                    <span class="badge bg-danger">
+                      <i class="fa fa-exclamation-triangle me-1"></i> Błąd
+                    </span>
+                  </t>
+                </div>
+                <div class="oe_kanban_text_content bg-light p-2 rounded" style="word-wrap: break-word; overflow-wrap: break-word;">
+                  <field name="body" widget="text_truncate" options="{'max_length': 120}"/>
+                </div>
+              </div>
+
+              <!-- Stopka karty -->
+              <div class="oe_kanban_bottom d-flex justify-content-end px-3 pb-2">
+                <t t-if="record.state.raw_value === 'draft'">
+                  <button type="object" name="action_send_now" class="btn btn-sm btn-outline-primary">
+                    <i class="fa fa-send me-1"></i> Wyślij
+                  </button>
+                </t>
+              </div>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+
+  <!-- Widok listy (tree) z pełną stylizacją -->
+  <record id="view_sms_message_tree" model="ir.ui.view">
+    <field name="name">sms.message.tree</field>
+    <field name="model">sms.message</field>
+    <field name="priority" eval="9"/>
+    <field name="arch" type="xml">
+      <tree string="Wiadomości SMS" decoration-muted="state == 'draft'"
+            decoration-warning="state == 'scheduled'"
+            decoration-success="state == 'sent'"
+            decoration-danger="state == 'failed'"
+            decoration-info="state == 'delivered'">
+        <field name="partner_id" widget="many2one_avatar"/>
+        <field name="body" widget="text_truncate" options="{'size': 60}"/>
+        <field name="char_count" widget="badge" class="bg-light text-dark" string="Znaki"/>
+        <field name="date_scheduled" widget="date" string="Data wysłania"/>
+        <field name="state" widget="selection_badge"
+               options="{'classes': {
+                 'draft': 'bg-secondary',
+                 'scheduled': 'bg-warning text-dark',
+                 'sent': 'bg-success',
+                 'delivered': 'bg-info',
+                 'failed': 'bg-danger'
+               }}"/>
+      </tree>
+    </field>
+  </record>
+
+  <!-- Widok formularza z pełną stylizacją -->
+  <record id="view_sms_message_form" model="ir.ui.view">
+    <field name="name">sms.message.form</field>
+    <field name="model">sms.message</field>
+    <field name="arch" type="xml">
+      <form string="SMS Message" class="o_sms_form">
+        <header>
+          <div class="d-flex flex-wrap justify-content-between w-100 align-items-center gap-2">
+            <field name="state" widget="statusbar"
+                   statusbar_visible="draft,scheduled,sent,delivered,failed"
+                   class="flex-grow-1 me-3"/>
+
+            <div class="d-flex flex-wrap align-items-center gap-3">
+              <!-- Pole wyboru numeru nadawcy z etykietą -->
+              <div class="d-flex align-items-center gap-2">
+                <label for="sender_number" class="mb-0 o_form_label">Numer nadawcy:</label>
+                <field name="sender_number"
+                       widget="selection"
+                       class="oe_inline"
+                       options="{'no_create': True}"
+                       help="Wybierz numer, z którego zostanie wysłany SMS"/>
+              </div>
+
+              <!-- Przyciski akcji -->
+              <div class="d-flex gap-2">
+                <button name="action_schedule"
+                        type="object"
+                        string="Zaplanuj"
+                        class="btn-secondary"
+                        invisible="state != 'draft'"/>
+                <button name="action_send_now"
+                        type="object"
+                        string="Wyślij teraz"
+                        class="btn-primary"
+                        invisible="state not in ('draft','scheduled')"/>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <sheet class="o_form_sheet_full_width o_form_sheet_bg">
+          <!-- Statystyki -->
+          <div class="row mb-4">
+            <div class="col-md-4">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h5 class="card-title">Status</h5>
+                  <h3 class="card-text">
+                    <field name="state" widget="badge"/>
+                  </h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h5 class="card-title">Znaki</h5>
+                  <h3 class="card-text">
+                    <field name="char_count"/>
+                  </h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h5 class="card-title">Data wysłania</h5>
+                  <h3 class="card-text">
+                    <field name="date_scheduled" widget="datetime"/>
+                  </h3>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TREŚĆ WIADOMOŚCI -->
+          <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-info text-white fw-bold">Treść wiadomości</div>
+            <div class="card-body">
+              <group col="2" class="mb-3">
+                <field name="template_id" string="Szablon wiadomości" options="{'no_create': True}"
+                       help="Wybierz przygotowany wcześniej szablon wiadomości SMS."/>
+                <field name="date_scheduled" string="Planowana data wysłania"
+                       help="Data i godzina, o której system ma wysłać SMS."/>
+              </group>
+
+              <group col="1" class="mb-3">
+                <field name="body" string="Treść" colspan="4" placeholder="Wpisz treść SMS…"
+                       help="Treść SMS‑a, która zostanie wysłana do odbiorców."/>
+              </group>
+
+              <group col="1">
+                <field name="char_count" string="Liczba znaków" readonly="1"
+                       help="Liczba znaków w treści wiadomości (maks. 160 znaków na segment)."/>
+              </group>
+            </div>
+          </div>
+
+          <!-- ODBIORCY -->
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-info text-white fw-bold">Odbiorcy</div>
+            <div class="card-body">
+              <group col="1" class="mb-3">
+                <field name="partner_id" string="Kontakt"
+                       help="Pojedynczy kontakt Odoo, do którego trafi SMS."/>
+              </group>
+
+              <group col="1">
+                <field name="group_ids" string="Grupy kontaktów" widget="many2many_tags"
+                       options="{'no_create': True}"
+                       help="Grupy kontaktów, do których trafi wiadomość. Możesz wybrać kilka."/>
+              </group>
+            </div>
+          </div>
+        </sheet>
+
+        <footer class="d-flex justify-content-end">
+          <button string="Anuluj" class="btn-secondary" special="cancel"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <!-- Widok wykresu -->
+  <record id="view_sms_message_graph" model="ir.ui.view">
+    <field name="name">sms.message.graph</field>
+    <field name="model">sms.message</field>
+    <field name="arch" type="xml">
+      <graph string="Statystyki SMS" type="bar">
+        <field name="state" type="row"/>
+        <field name="id" type="measure" operator="count"/>
+        <field name="date_scheduled" type="col" interval="month"/>
+      </graph>
+    </field>
+  </record>
+
+  <!-- Widok przestawny -->
+  <record id="view_sms_message_pivot" model="ir.ui.view">
+    <field name="name">sms.message.pivot</field>
+    <field name="model">sms.message</field>
+    <field name="arch" type="xml">
+      <pivot string="Analiza wiadomości SMS">
+        <field name="state" type="row"/>
+        <field name="sender_number" type="col"/>
+        <field name="id" type="measure" operator="count"/>
+        <field name="date_scheduled" type="col" interval="month"/>
+      </pivot>
+    </field>
+  </record>
+</odoo>
