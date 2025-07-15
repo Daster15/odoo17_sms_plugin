@@ -14,12 +14,13 @@
         'views/sms_report_views.xml',
         'reports/sms_report_templates.xml',
         'reports/sms_report_actions.xml',
+        'views/sms_campaign_portal_templates.xml',
         'data/cron_jobs.xml',
     ],
     'demo': [
-        'data/sms_conversation_demo.xml',
-        'data/sms_campanings.xml',
-        'data/sms_demo_data.xml',
+      #  'data/sms_conversation_demo.xml',
+      #  'data/sms_campanings.xml',
+       # 'data/sms_demo_data.xml',
     ],
     'assets': {
         'web.assets_backend': [

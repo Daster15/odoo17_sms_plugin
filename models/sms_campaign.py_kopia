@@ -39,7 +39,6 @@ class SmsCampaign(models.Model):
             ('+48111222333', 'Support (+48 600 200 200)')
         ]
 
-
     # Pola statystyczne
 
     pending_count = fields.Integer(
@@ -80,44 +79,20 @@ class SmsCampaign(models.Model):
         store=True
     )
 
-    @api.depends('message_ids', 'message_ids.state', 'message_ids.sms_gateway_response')
+
+
+    @api.depends('message_ids', 'message_ids.state')
     def _compute_stats(self):
         for campaign in self:
             messages = campaign.message_ids
-            # Ile w ogóle wiadomości
             campaign.message_count = len(messages)
+            campaign.sent_count = len(messages.filtered(lambda m: m.state in ['sent', 'delivered']))
+            campaign.delivered_count = len(messages.filtered(lambda m: m.state == 'delivered'))
+            campaign.failed_count = len(messages.filtered(lambda m: m.state == 'failed'))
+            campaign.scheduled_count = len(messages.filtered(lambda m: m.state == 'scheduled'))
 
-            # Wysłane: stan 'sent' lub 'delivered'
-            campaign.sent_count = len(
-                messages.filtered(lambda m: m.state in ('sent', 'delivered'))
-            )
-
-            # Dostarczone: na podstawie sms_gateway_response
-            def _is_delivered(m):
-                if not m.sms_gateway_response:
-                    return False
-                txt = m.sms_gateway_response.lower()
-                return 'zakończona sukcesem' in txt or 'potwierdziło wysyłkę' in txt
-
-            campaign.delivered_count = len(
-                messages.filtered(_is_delivered)
-            )
-
-            # Nieudane
-            campaign.failed_count = len(
-                messages.filtered(lambda m: m.state == 'failed')
-            )
-
-            # Zaplanowane
-            campaign.scheduled_count = len(
-                messages.filtered(lambda m: m.state == 'scheduled')
-            )
-
-            # % dostarczeń
-            if campaign.message_count:
-                campaign.delivery_rate = (
-                    campaign.delivered_count / campaign.message_count * 100.0
-                )
+            if campaign.message_count > 0:
+                campaign.delivery_rate = (campaign.delivered_count / campaign.message_count) * 100
             else:
                 campaign.delivery_rate = 0.0
 
