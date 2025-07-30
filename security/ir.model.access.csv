@@ -3,5 +3,6 @@ access_sms_campaign,sms.campaign,model_sms_campaign,,1,1,1,1
 access_sms_conversation,sms.conversation,model_sms_conversation,,1,1,1,1
 access_sms_message,sms.message,model_sms_message,,1,1,1,1
 access_sms_template,sms.template,model_sms_template,,1,1,1,1
+access_sms_user_sender_number,access SMS User Sender Number,model_sms_user_sender_number,base.group_user,1,1,1,1
 odoo17_sms_plugin.access_sms_report_wizard,access_sms_report_wizard,odoo17_sms_plugin.model_sms_report_wizard,base.group_user,1,1,1,1
 odoo17_sms_plugin.access_sms_conversation_line,access_sms_conversation_line,odoo17_sms_plugin.model_sms_conversation_line,base.group_user,1,1,1,1

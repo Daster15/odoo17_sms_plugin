@@ -7,6 +7,9 @@ from datetime import datetime
 import csv
 import io
 import logging
+import xlsxwriter
+import math, json
+from odoo.http import request, content_disposition
 
 _logger = logging.getLogger(__name__)
 
@@ -42,14 +45,20 @@ class SmsCampaignPortal(http.Controller):
                                     order='date_start desc')
         page_count = (total_campaigns + page_size - 1) // page_size
 
-        # Statystyki
-        #stats = {
-        #    'total_campaigns': total_campaigns,
-        #    'total_messages': sum(c.message_count or 0 for c in Campaign.search(domain)),
-        #    'total_sent': sum(c.sent_count or 0 for c in Campaign.search(domain)),
-         #   'total_delivered': sum(c.delivered_count or 0 for c in Campaign.search(domain)),
-        #    'total_failed': sum(c.failed_count or 0 for c in Campaign.search(domain))
-        #}
+        user = request.env.user.sudo()
+        send_days = [
+            ('Poniedziałek', user.send_on_monday),
+            ('Wtorek', user.send_on_tuesday),
+            ('Środa', user.send_on_wednesday),
+            ('Czwartek', user.send_on_thursday),
+            ('Piątek', user.send_on_friday),
+            ('Sobota', user.send_on_saturday),
+            ('Niedziela', user.send_on_sunday),
+        ]
+        allowed_days = [label for label, is_active in send_days if is_active]
+        hours_from = user.hours_from
+        hours_to = user.hours_to
+
         stats = {
             'stats_total_campaigns': total_campaigns,
             'stats_total_messages': sum(c.message_count or 0 for c in Campaign.search(domain)),
@@ -71,6 +80,9 @@ class SmsCampaignPortal(http.Controller):
             'page_count':   math.ceil(total_campaigns / page_size),
             # dodatkowo zostawiamy total_campaigns, ale statystyki biorą się z stats_*
             'total_campaigns': total_campaigns,
+            'allowed_days': allowed_days,
+            'hours_from': hours_from,
+            'hours_to': hours_to,
             **stats,
         })
 
@@ -89,6 +101,15 @@ class SmsCampaignPortal(http.Controller):
         total_messages = len(campaign.message_ids)
         messages = campaign.message_ids[(page - 1) * page_size: page * page_size]
         page_count = (total_messages + page_size - 1) // page_size
+        domain = [('campaign_id', '=', campaign.id)]
+        Message = request.env['sms.message']
+        messages = Message.search(domain, offset=(page - 1) * page_size, limit=page_size, order='date_scheduled desc')
+
+        # Przygotuj dane do wykresu
+        labels = ['Oczekujące', 'Zaplanowane', 'Wysłane', 'Dostarczone', 'Nieudane']
+        states = ['draft', 'scheduled', 'sent', 'delivered', 'failed']
+        values = [len(campaign.message_ids.filtered(lambda m: m.state == st))
+                  for st in states]
 
         return request.render('odoo17_sms_plugin.sms_campaign_detail_page', {
             'campaign': campaign,
@@ -98,41 +119,48 @@ class SmsCampaignPortal(http.Controller):
             'page': page,
             'page_size': page_size,
             'page_count': page_count,
-            'back_url': '/my/sms_campaigns'
+            'back_url': '/my/sms_campaigns',
+            'chart_labels_json': json.dumps(labels),
+            'chart_values_json': json.dumps(values),
         })
 
     @http.route(['/my/sms_campaigns/<int:campaign_id>/edit'], type='http', auth='user', website=True)
     def portal_sms_campaign_edit(self, campaign_id, **kw):
         """Renderuje formularz edycji kampanii"""
+        _logger.info("edycja 222222222222222!!!!!!!!!!!!!!!!!!")
         campaign = request.env['sms.campaign'].sudo().browse(campaign_id)
+        warning = request.session.pop('portal_warning', False)
         if not campaign.exists():
             return request.not_found()
         sender_numbers = request.env['sms.campaign'].sudo()._get_available_campaning_sender_numbers()
         return request.render('odoo17_sms_plugin.sms_campaign_edit_page', {
             'campaign': campaign,
+            'portal_warning': warning,
             'sender_numbers': sender_numbers,
      })
 
-    @http.route(['/my/sms_campaigns/<int:campaign_id>/edit'], type='http', methods=['POST'], auth='user', website=True)
+    @http.route(['/my/sms_campaigns/<int:campaign_id>/update'], type='http', methods=['POST'], auth='user',
+                website=True)
     def portal_sms_campaign_update(self, campaign_id, **post):
-        _logger.info("edycja !!!!!!!!!!!!!!!!!!")
-        raw_start = post.get('date_start')
-        raw_end = post.get('date_end')
+        campaign = request.env['sms.campaign'].sudo().browse(campaign_id)
+        if not campaign:
+            return request.not_found()
+        # Przygotowanie wartości
         vals = {
             'name': post.get('name'),
             'single_message': post.get('single_message'),
             'sender_number': post.get('sender_number'),
         }
+        raw_start = post.get('date_start')
         if raw_start:
             dt = datetime.strptime(raw_start, '%Y-%m-%dT%H:%M')
             vals['date_start'] = dt.strftime('%Y-%m-%d %H:%M:%S')
-        if raw_end:
-            dt = datetime.strptime(raw_end, '%Y-%m-%dT%H:%M')
-            vals['date_end'] = dt.strftime('%Y-%m-%d %H:%M:%S')
-        else:
-            vals['date_end'] = False
-
-        campaign = request.env['sms.campaign'].sudo().browse(campaign_id)
+            # Walidacja
+            message = request.env['sms.campaign'].sudo()._check_date_start_logic(vals['date_start'])
+            if message:
+                request.session['portal_warning'] = message
+                return request.redirect(f'/my/sms_campaigns/{campaign.id}/edit')
+        # Zapis
         campaign.write(vals)
         return request.redirect(f'/my/sms_campaigns/{campaign.id}')
 
@@ -140,31 +168,32 @@ class SmsCampaignPortal(http.Controller):
     def portal_sms_campaign_new(self, **kw):
         """Renderuje formularz tworzenia nowej kampanii"""
         sender_numbers = request.env['sms.campaign'].sudo()._get_available_campaning_sender_numbers()
+        warning = request.session.pop('portal_warning', False)
         return request.render('odoo17_sms_plugin.sms_campaign_new_page', {
+            'portal_warning': warning,
             'sender_numbers': sender_numbers,
         })
 
     @http.route(['/my/sms_campaigns/new'], type='http', methods=['POST'], auth='user', website=True)
     def portal_sms_campaign_create(self, **post):
-        # parsowanie dat
-        raw_start = post.get('date_start')
-        raw_end = post.get('date_end')
+        # Przygotowanie wartości
         vals = {
             'name': post.get('name'),
             'state': 'draft',
             'single_message': post.get('single_message'),
-            # pobieramy WYBRANĄ wartość, nie całą listę
             'sender_number': post.get('sender_number'),
         }
+        raw_start = post.get('date_start')
         if raw_start:
+            # Parsowanie z formatu HTML5 datetime-local
             dt = datetime.strptime(raw_start, '%Y-%m-%dT%H:%M')
             vals['date_start'] = dt.strftime('%Y-%m-%d %H:%M:%S')
-        if raw_end:
-            dt = datetime.strptime(raw_end, '%Y-%m-%dT%H:%M')
-            vals['date_end'] = dt.strftime('%Y-%m-%d %H:%M:%S')
-        else:
-            vals['date_end'] = False
-
+            # Walidacja przy użyciu modelu
+            message = request.env['sms.campaign'].sudo()._check_date_start_logic(vals['date_start'])
+            if message:
+                request.session['portal_warning'] = message
+                return request.redirect('/my/sms_campaigns/new')
+        # Tworzenie kampanii
         campaign = request.env['sms.campaign'].sudo().create(vals)
         return request.redirect(f'/my/sms_campaigns/{campaign.id}')
 
@@ -213,6 +242,19 @@ class SmsCampaignPortal(http.Controller):
                 msg.write({'state': 'draft'})
         return request.redirect(f'/my/sms_campaigns/{campaign.id}')
 
+    @http.route(['/my/sms_campaigns/<int:campaign_id>/retry_all'], type='http', auth='user', website=True)
+    def portal_sms_campaign_retry_all(self, campaign_id, **kw):
+        """
+        Odświeża statusy wszystkich SMS-ów w kampanii i przekierowuje z powrotem na detail.
+        """
+        campaign = request.env['sms.campaign'].sudo().browse(campaign_id)
+        if not campaign.exists():
+            return request.not_found()
+        # wczytanie i zaktualizowanie statusów (poll) wszystkich wiadomości
+        # wykorzystujemy już istniejącą metodę modelu:
+        request.env['sms.message'].sudo().poll_delivery_status()
+        return request.redirect(f'/my/sms_campaigns/{campaign.id}')
+
     @http.route(['/my/sms_campaigns/<int:campaign_id>/upload_csv'],
                 type='http', auth='user', methods=['POST'], website=True)
     def portal_sms_campaign_upload_csv(self, campaign_id, **post):
@@ -230,9 +272,14 @@ class SmsCampaignPortal(http.Controller):
 
             Partner = request.env['res.partner'].sudo()
             created = 0
+            limit = 10  # maksymalna liczba rekordów do zaimportowania
+
             for row in reader:
+                if created >= limit:
+                    _logger.info("Osiągnięto limit %s rekordów – pozostałe wiersze zostały pominięte", limit)
+                    break
+
                 phone = (row.get('phone') or row.get('phone_number') or '').strip()
-                # wymagamy tylko numeru
                 if not phone:
                     continue
 
@@ -243,7 +290,6 @@ class SmsCampaignPortal(http.Controller):
                         'phone': phone,
                     })
 
-                # treść zawsze z pola single_message kampanii
                 request.env['sms.message'].sudo().create({
                     'campaign_id': campaign.id,
                     'partner_id': partner.id,
@@ -252,7 +298,7 @@ class SmsCampaignPortal(http.Controller):
                 })
                 created += 1
 
-            request.session['portal_success'] = f"Zaimportowano {created} wiadomości"
+            request.session['portal_success'] = f"Zaimportowano {created} wiadomości (limit {limit})"
         except Exception as e:
             request.session['portal_warning'] = f"Błąd importu: {e}"
 
@@ -271,3 +317,76 @@ class SmsCampaignPortal(http.Controller):
         }
         qs = "&".join(f"{k}={v}" for k, v in params.items() if v)
         return f"/my/sms_campaigns?{qs}"
+
+    @http.route([
+        '/my/sms_campaigns/<int:campaign_id>/export_excel'
+    ], type='http', auth='user', website=True)
+    def portal_sms_campaign_export_excel(self, campaign_id, **kw):
+        # Pobierz kampanię
+        campaign = request.env['sms.campaign'].sudo().browse(campaign_id)
+        if not campaign.exists():
+            return request.not_found()
+
+        # Filtrujemy tylko wysłane SMS-y
+        messages = campaign.message_ids.filtered(lambda m: m.state == 'sent')
+
+        # Przygotowanie pliku XLSX w pamięci
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        sheet = workbook.add_worksheet("Wysłane SMS")
+
+        # Nagłówki
+        headers = [
+            'Lp.', 'Data zaplanowana', 'Numer odbiorcy', 'Treść wiadomości',
+            'External ID', 'Odpowiedź bramki', 'Status'
+        ]
+        for col, title in enumerate(headers):
+            sheet.write(0, col, title)
+
+        # Wypełniamy wiersze danymi
+        for row, msg in enumerate(messages, start=1):
+            sheet.write(row, 0, row)
+            # date_scheduled to datetime lub False
+            sheet.write(row, 1, msg.date_scheduled.strftime('%Y-%m-%d %H:%M:%S')
+            if msg.date_scheduled else '')
+            sheet.write(row, 2, msg.partner_id.phone or '')
+            sheet.write(row, 3, msg.body or '')
+            sheet.write(row, 4, msg.external_id or '')
+            sheet.write(row, 5, msg.sms_gateway_response or '')
+            sheet.write(row, 6, msg.sms_gateway_response_human or '')
+            sheet.write(row, 7, msg.state)
+
+        workbook.close()
+        output.seek(0)
+        data = output.read()
+
+        # Przygotowanie odpowiedzi HTTP z załącznikiem
+        filename = f"sms_campaign_{campaign.id}_messages.xlsx"
+        return request.make_response(
+            data,
+            headers=[
+                ('Content-Type',
+                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+                ('Content-Disposition', content_disposition(filename))
+            ]
+        )
+
+    @http.route(['/my/sms_campaigns/<int:campaign_id>/send_report_email'],
+                type='http', auth='user', website=True)
+    def portal_sms_campaign_send_report_email(self, campaign_id, **kw):
+        """
+        Wysyła raport XLSX kampanii na e-mail ustawiony w stats_email użytkownika.
+        """
+        campaign = request.env['sms.campaign'].sudo().browse(campaign_id)
+        if not campaign.exists():
+            return request.not_found()
+
+        try:
+            campaign.send_excel_report_by_email()
+            request.session['portal_success'] = f"Raport kampanii '{campaign.name}' został wysłany na e-mail."
+        except Exception as e:
+            _logger.exception("Błąd wysyłki raportu dla kampanii %s", campaign.name)
+            request.session['portal_warning'] = f"Błąd wysyłki raportu: {str(e)}"
+
+        # Po wysyłce przekierowanie z powrotem do szczegółów kampanii
+        return request.redirect(f'/my/sms_campaigns/{campaign.id}')

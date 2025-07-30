@@ -1,0 +1,48 @@
+<odoo>
+  <record id="view_res_users_form_sms_settings" model="ir.ui.view">
+    <field name="name">res.users.form.inherit.sms.settings</field>
+    <field name="model">res.users</field>
+    <field name="inherit_id" ref="base.view_users_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//page[@name='preferences']" position="after">
+        <page string="SMS">
+          <group>
+            <field name="sender_number_ids" colspan="2">
+              <tree editable="bottom" create="true" delete="true">
+                <field name="number"/>
+              </tree>
+            </field>
+            <field name="default_sender_number_id" colspan="2"
+                   options="{'no_create': True}"
+                   placeholder="Wybierz domyślny numer"/>
+          </group>
+          <group>
+            <field name="stats_email"/>
+          </group>
+          <group>
+            <field name="sms_api_endpoint"/>
+          </group>
+          <group>
+            <field name="sms_api_user"/>
+          </group>
+          <group>
+            <field name="sms_api_password"/>
+          </group>
+          <group string="Dni tygodnia">
+            <field name="send_on_monday"/>
+            <field name="send_on_tuesday"/>
+            <field name="send_on_wednesday"/>
+            <field name="send_on_thursday"/>
+            <field name="send_on_friday"/>
+            <field name="send_on_saturday"/>
+            <field name="send_on_sunday"/>
+          </group>
+          <group string="Godziny wysyłki">
+            <field name="hours_from" widget="float_time"/>
+            <field name="hours_to"   widget="float_time"/>
+          </group>
+        </page>
+      </xpath>
+    </field>
+  </record>
+</odoo>

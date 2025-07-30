@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+  <t t-name="odoo17_sms_plugin.ContactsTable">
+    <div class="container">
+      <h1 class="mt-5 mb-5">Welcome From Movies!</h1>
+      <div class="d-flex justify-content-between mb-2 mt-2">
+        <input t-ref="name" type="text" class="form-control"
+               t-on-keyup="(e)=>this.searchPartners(e)"/>
+        <button class="btn btn-primary oi oi-search mx-2"
+                t-on-click="searchPartners"/>
+        <button type="button" class="btn btn-primary mx-2"
+                data-bs-toggle="modal" data-bs-target="#exampleModal">
+          New
+        </button>
+      </div>
+      <div style="max-height: 500px; overflow-y: auto;">
+        <table class="table">
+          <thead class="sticky-top bg-dark text-white">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Name</th>
+              <th scope="col">Phone</th>
+              <th scope="col">Email</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <t t-foreach="paginatedPartners()" t-as="partner" t-key="partner.id">
+              <tr>
+                <th scope="row">
+                  <span t-esc="((state.currentPage-1)*state.pageSize) + (partner_index+1)"/>
+                </th>
+                <td><t t-esc="partner.name or '-'"/></td>
+                <td><t t-esc="partner.phone or '-'"/></td>
+                <td><t t-esc="partner.email or '-'"/></td>
+                <td>
+                  <button class="btn btn-warning m-2"
+                          t-on-click="()=>this.updatePartner(partner)"
+                          data-bs-toggle="modal"
+                          data-bs-target="#exampleModal">
+                    Update
+                  </button>
+                  <button class="btn btn-danger m-2"
+                          t-on-click="()=>this.deletePartner(partner)">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+      <!-- Kontrolki paginacji -->
+      <nav aria-label="Pagination">
+        <ul class="pagination justify-content-center mt-3">
+          <li class="page-item" t-att-class="{'disabled': state.currentPage === 1}">
+            <a class="page-link" href="#" t-on-click.prevent="prevPage">Poprzednia</a>
+          </li>
+          <t t-foreach="Array(totalPages()).fill().map((_, i) => i + 1)"
+   t-as="pageNum"
+   t-key="pageNum">
+  <li class="page-item" t-att-class="{'active': state.currentPage === pageNum}">
+    <a class="page-link"
+       href="#"
+       t-on-click.prevent="()=>this.goToPage(pageNum)">
+      <t t-esc="pageNum"/>
+    </a>
+  </li>
+</t>
+          <li class="page-item"
+              t-att-class="{'disabled': state.currentPage === totalPages()}">
+            <a class="page-link" href="#" t-on-click.prevent="nextPage">Następna</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Modal (bez zmian) -->
+      <div class="modal fade" id="exampleModal" tabindex="-1"
+           aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">New</h5>
+              <button type="button" class="btn-close"
+                      data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="container">
+                <input type="text" class="form-control m-2"
+                       placeholder="Name" t-model="state.partner.name"/>
+                <input type="text" class="form-control m-2"
+                       placeholder="Email" t-model="state.partner.email"/>
+                <input type="text" class="form-control m-2"
+                       placeholder="Phone" t-model="state.partner.phone"/>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary m-2"
+                      data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary m-2"
+                      t-on-click="savePartner">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </t>
+</templates>

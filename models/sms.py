@@ -2,6 +2,7 @@ from odoo import models, fields, api
 import logging
 import requests
 import re
+from datetime import datetime, timedelta
 from odoo.tools.safe_eval import safe_eval
 
 _logger = logging.getLogger(__name__)
@@ -40,16 +41,15 @@ class SmsMessage(models.Model):
     )
 
     sms_gateway_response = fields.Text(string='SMS Gateway Response')
-
+    sms_gateway_response_human = fields.Text(string='Potwierdzenie dostarczenia')
+    sms_reply_number = fields.Integer(string='Retry Count', default=0, help='Ilość ponownych prób wysyłki')
 
 
     def _get_available_sender_numbers(self):
-        """Zwraca listę dostępnych numerów nadawcy"""
-        return [
-            ('+48123456789', 'CLIP (POXBOX)'),
-            ('+48987654321', 'Marketing (+48 600 100 100)'),
-            ('+48111222333', 'Support (+48 600 200 200)')
-        ]
+        """Zwraca listę tuple (value, label) z numerami nadawcy
+        zdefiniowanymi dla zalogowanego użytkownika."""
+        numbers = self.env.user.sender_number_ids
+        return [(rec.number, rec.number) for rec in numbers]
 
     def _get_default_sender_number(self):
         """Zwraca domyślny numer nadawcy"""
@@ -57,9 +57,9 @@ class SmsMessage(models.Model):
         return numbers[0][0] if numbers else False
 
     # Hardcoded API credentials and URL
-    API_USERNAME = 'zadmin'
-    API_PASSWORD = 'P@ssPOXskademo'
-    API_URL = 'https://skademo.poxbox.pl/'
+    #API_USERNAME = 'zadmin'
+    #API_PASSWORD = 'P@ssPOXskademo'
+   # API_URL = 'https://skademo.poxbox.pl/'
 
     @api.onchange('template_id', 'partner_id', 'campaign_id')
     def _onchange_template(self):
@@ -98,7 +98,13 @@ class SmsMessage(models.Model):
 
     @api.model
     def _call_api(self, method, payload):
-        endpoint = f"{self.API_URL.rstrip('/')}/smsapi/{method}"
+        #endpoint = f"{self.API_URL.rstrip('/')}/smsapi/{method}"
+        user = self.env.user
+        #url = user.sms_api_endpoint or ''
+        url = user.sms_api_endpoint or 'https://skademo.poxbox.pl/'
+        endpoint = f"{url.rstrip('/')}/smsapi/{method}"
+        payload['username'] = user.sms_api_user
+        payload['password'] = user.sms_api_password
         try:
             resp = requests.post(endpoint, json=payload, timeout=15)
             resp.raise_for_status()
@@ -131,8 +137,8 @@ class SmsMessage(models.Model):
             'text': message_text,
         }
         payload = {
-            'username': self.API_USERNAME,
-            'password': self.API_PASSWORD,
+           # 'username': self.API_USERNAME,
+           # 'password': self.API_PASSWORD,
             'messages': [msg],
             'extended_view': 'sms_details',
         }
@@ -172,8 +178,8 @@ class SmsMessage(models.Model):
 
         msg = {'destination_number': phone_number, 'text': message_text}
         payload = {
-            'username': self.API_USERNAME,
-            'password': self.API_PASSWORD,
+           # 'username': self.API_USERNAME,
+           # 'password': self.API_PASSWORD,
             'messages': [msg],
             'extended_view': 'sms_details',
         }
@@ -194,8 +200,8 @@ class SmsMessage(models.Model):
 
         # 2) od razu poll statusu po konkretnym smsid
         poll_payload = {
-            'username': self.API_USERNAME,
-            'password': self.API_PASSWORD,
+           # 'username': self.API_USERNAME,
+           # 'password': self.API_PASSWORD,
             'messageids': [smsid],
         }
         poll = self._call_api('retrieve_sent_sms_by_ids', poll_payload)
@@ -225,8 +231,8 @@ class SmsMessage(models.Model):
         for msg in self.filtered(lambda m: m.state in ('draft', 'scheduled')):
             # Budowa payload
             payload = {
-                'username': self.API_USERNAME,
-                'password': self.API_PASSWORD,
+               # 'username': self.API_USERNAME,
+               # 'password': self.API_PASSWORD,
                 'messages': [{
                     'destination_number': msg.partner_id.phone,
                     'text': msg.body
@@ -253,8 +259,8 @@ class SmsMessage(models.Model):
         if not smsids:
             return
         payload = {
-            'username': self.API_USERNAME,
-            'password': self.API_PASSWORD,
+          #  'username': self.API_USERNAME,
+          # 'password': self.API_PASSWORD,
             'messageids': smsids,
         }
         res = self._call_api('retrieve_sent_sms_by_ids', payload)
@@ -284,8 +290,8 @@ class SmsMessage(models.Model):
         to_check = self.search([('external_id', '!=', False), ('state', '=', 'sent')])
         for msg in to_check:
             payload = {
-                'username': self.API_USERNAME,
-                'password': self.API_PASSWORD,
+              #  'username': self.API_USERNAME,
+              #  'password': self.API_PASSWORD,
                 'criteria': [{'destination_number': msg.partner_id.phone}]
             }
             result = self._call_api('query_sent_messages', payload)
@@ -299,17 +305,118 @@ class SmsMessage(models.Model):
 
     @api.model
     def poll_delivery_status(self):
-        _logger.info("Jestem !!!!!!!!!!!!!")
+        _logger.info("Jestem w poll_delivery_status")
+        # 1) szukamy tylko SMS-ów które już były wysłane
+        to_check = self.search([
+            ('external_id', '!=', False),
+            ('state', '=', 'sent'),
+        ])
+        for msg in to_check:
+            # 2) jeżeli już mamy pełny sukces, pomijamy
+            if msg.sms_gateway_response and msg.sms_gateway_response.lower() == 'wysyłka zakończona sukcesem':
+                continue
+
+            # 3) pobieramy aktualny status z API
+            payload = {
+                'messageids': [msg.external_id],
+                'extended_view': 'sms_details',
+            }
+            try:
+                result = msg._call_api('retrieve_sent_sms_by_ids', payload)
+            except Exception as e:
+                _logger.warning("Błąd API retrieve_sent_sms_by_ids dla %s: %s", msg.external_id, e)
+                continue
+
+            messages = result.get('messages') or []
+            if not messages:
+                _logger.warning("Brak danych statusu dla SMS %s", msg.external_id)
+                continue
+
+            info = messages[0]
+            status = (info.get('status') or '').lower()
+
+            # 4) mapowanie statusów na human-readable
+            if 'wysyłka zakończona sukcesem' in status or 'potwierdziło wysyłkę' in status:
+                msg.sms_gateway_response_human = 'Dostarczono'
+                msg.sms_gateway_response = status
+                # stan pozostaje 'sent'
+            elif 'zakończona błędem' in status or 'odrzuciło wysyłkę' in status:
+                msg.sms_gateway_response_human = 'Nie Dostarczono'
+                msg.sms_gateway_response = status
+            elif 'zakolejkowan' in status:
+                msg.sms_gateway_response_human = 'Kolejka'
+                msg.sms_gateway_response = status
+            else:
+                msg.sms_gateway_response_human = 'Nieznany'
+                msg.sms_gateway_response = status
+                _logger.info("Nieznany status SMS %s: %s", msg.external_id, status)
+
+            # 5) retry logic: jeśli to nie był sukces, ponawiamy do 3 razy co 10 minut
+            if not any(s in status for s in ['wysyłka zakończona sukcesem']):
+                tries = msg.sms_reply_number or 0
+                if tries < 3:
+                    next_send = datetime.now() + timedelta(minutes=10)
+                    msg.write({
+                        'sms_reply_number': tries + 1,
+                        'state': 'sent',
+                        'date_scheduled': next_send,
+                        'sms_gateway_response': status,
+                        'sms_gateway_response_human': 'Oczekiwanie na potwierdzenie',
+                    })
+                    _logger.info(
+                        "SMS %s: nieudana próba, planuję ponownie za 10m (próba %s/3)",
+                        msg.external_id, tries + 1
+                    )
+                else:
+                    msg.state = 'failed'
+                    msg.sms_gateway_response_human = 'Nie dostarczono'
+                    _logger.warning(
+                        "SMS %s: wyczerpane 3 próby, oznaczam jako failed",
+                        msg.external_id
+                    )
+
+        # 6) Sprawdzenie i zakończenie kampanii, jeśli wszystkie wiadomości zakończone
+        Campaign = self.env['sms.campaign']
+        for campaign in Campaign.search([('state', '!=', 'done')]):
+            messages = campaign.message_ids
+
+            # 1) Czy wszystkie wiadomości są w stanach 'Dostarczono' lub 'Nie dostarczono'
+            valid_states = all(
+                (m.sms_gateway_response_human or '') in ('Dostarczono', 'Nie dostarczono')
+                for m in messages
+            )
+
+            # 2) Czy wszystkie 'Nie dostarczono' mają co najmniej 3 próby
+            all_failed_tried_3_times = all(
+                (m.sms_reply_number or 0) >= 3
+                for m in messages.filtered(lambda m: (m.sms_gateway_response_human or '') == 'Nie dostarczono')
+            )
+
+            # 3) Jeśli spełnione warunki → zakończ kampanię
+            if messages and valid_states and all_failed_tried_3_times:
+                campaign.write({
+                    'state': 'done',
+                    'date_end': fields.Datetime.now()
+                })
+                _logger.info(
+                    "Kampania %s ustawiona jako zakończona (Dostarczono / Nie dostarczono z 3 próbami)",
+                    campaign.name
+                )
+                campaign.send_excel_report_by_email()
+
+    def poll_delivery_status_all(self):
+        _logger.info("Jestem w poll_delivery_status_all !!!!!!!!!!!!!!")
         to_check = self.search([
             ('external_id', '!=', False),
             ('state', '=', 'sent')
         ])
         for msg in to_check:
             payload = {
-                'username': self.API_USERNAME,
-                'password': self.API_PASSWORD,
+               # 'username': self.API_USERNAME,
+              #  'password': self.API_PASSWORD,
                 # Pobieramy zwrot po konkretnym external_id
                 'messageids': [msg.external_id],
+
             }
             try:
                 result = self._call_api('retrieve_sent_sms_by_ids', payload)
@@ -328,14 +435,18 @@ class SmsMessage(models.Model):
             # sukces
             if 'zakończona sukcesem' in status or 'potwierdziło wysyłkę' in status:
                # msg.state = 'delivered'
+                msg.sms_gateway_response_human = 'Dostarczono'
                 msg.sms_gateway_response = status
             # błąd
             elif 'zakończona błędem' in status or 'odrzuciło wysyłkę' in status:
+                msg.sms_gateway_response_human = 'Nie Dostarczono'
                 msg.sms_gateway_response = status
             # kolejka
             elif 'zakolejkowan' in status:
+                msg.sms_gateway_response_human = 'Nie Dostarczono'
                 msg.sms_gateway_response = status
             else:
+                msg.sms_gateway_response_human = 'Nie Dostarczono'
                 msg.sms_gateway_response = status
                 _logger.info("Nieznany status SMS %s: %s", msg.external_id, status)
 
