@@ -202,7 +202,7 @@ class SmsCampaign(models.Model):
             # % dostarczeń
             if campaign.message_count:
                 campaign.delivery_rate = (
-                    campaign.delivered_count / campaign.message_count * 100.0
+                    campaign.sent_count / campaign.message_count * 100.0
                 )
             else:
                 campaign.delivery_rate = 0.0
@@ -215,36 +215,77 @@ class SmsCampaign(models.Model):
                 _logger.warning("Brak adresu stats_email dla użytkownika %s", user.name)
                 continue
 
-            # Pobierz wiadomości z kampanii
             messages = campaign.message_ids.filtered(lambda m: m.state in ('sent', 'delivered', 'failed'))
 
-            # Stwórz plik Excel w pamięci
+            # === Tworzenie Excela ===
             output = io.BytesIO()
             workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-            sheet = workbook.add_worksheet("Raport")
+            sheet = workbook.add_worksheet("Raport SMS")
 
-            headers = ['Lp.', 'Numer odbiorcy', 'Treść wiadomości','Ilość znaków', 'External ID', 'Status',
-                       'Odpowiedź bramki','Ilość prób wysyłki']
+            # === Style ===
+            title_format = workbook.add_format({
+                'bold': True, 'font_size': 16, 'align': 'center', 'valign': 'vcenter'
+            })
+            stat_label_format = workbook.add_format({
+                'bold': True, 'bg_color': '#DCE6F1', 'border': 1
+            })
+            stat_value_format = workbook.add_format({
+                'border': 1
+            })
+            header_format = workbook.add_format({
+                'bold': True, 'bg_color': '#4F81BD', 'font_color': 'white', 'border': 1
+            })
+            row_format_1 = workbook.add_format({'border': 1, 'bg_color': '#FFFFFF'})
+            row_format_2 = workbook.add_format({'border': 1, 'bg_color': '#F2F2F2'})
+
+            # === Tytuł raportu ===
+            sheet.merge_range('A1:H1', f"Raport SMS dla - {campaign.name} z dnia {campaign.date_start.strftime('%Y-%m-%d %H:%M:%S')}", title_format)
+
+            # === Sekcja statystyk ===
+            stats = [
+                ['Wiadomości ogółem', campaign.message_count],
+                ['Wysłane', campaign.sent_count],
+                ['Dostarczone', campaign.delivered_count],
+                ['Nieudane', campaign.failed_count],
+                ['Wskaźnik dostarczenia (%)', f"{campaign.delivery_rate:.2f}"],
+            ]
+            stat_row_start = 2
+            for row_idx, (label, value) in enumerate(stats, start=stat_row_start):
+                sheet.write(row_idx, 0, label, stat_label_format)
+                sheet.write(row_idx, 1, value, stat_value_format)
+
+            # === Nagłówki tabeli ===
+            start_row = stat_row_start + len(stats) + 2
+            headers = [
+                'Lp.', 'Numer odbiorcy', 'Treść wiadomości', 'Ilość znaków',
+                'Ilość wiadomości', 'Status', 'Odpowiedź bramki', 'Ilość prób wysyłki'
+            ]
             for col, title in enumerate(headers):
-                sheet.write(0, col, title)
+                sheet.write(start_row, col, title, header_format)
 
-            for row, msg in enumerate(messages, start=1):
-                sheet.write(row, 0, row)
-                sheet.write(row, 1, msg.partner_id.phone or '')
-                sheet.write(row, 2, msg.body or '')
-                sheet.write(row, 3, msg.char_count or '')
-                sheet.write(row, 4, msg.external_id or '')
-                sheet.write(row, 5, msg.state or '')
-                sheet.write(row, 6, msg.sms_gateway_response_human or '')
-                sheet.write(row, 7, msg.sms_reply_number or '')
+            # === Dane ===
+            for row, msg in enumerate(messages, start=start_row + 1):
+                fmt = row_format_1 if (row - start_row) % 2 else row_format_2
+                sheet.write(row, 0, row - start_row, fmt)
+                sheet.write(row, 1, msg.partner_id.phone or '', fmt)
+                sheet.write(row, 2, msg.body or '', fmt)
+                sheet.write(row, 3, msg.char_count or '', fmt)
+                sheet.write(row, 4, msg.sms_message_count or '', fmt)
+                sheet.write(row, 5, msg.state or '', fmt)
+                sheet.write(row, 6, msg.sms_gateway_response_human or '', fmt)
+                sheet.write(row, 7, msg.sms_reply_number or '', fmt)
+
+            # Auto-dopasowanie kolumn
+            for col in range(len(headers)):
+                sheet.set_column(col, col, 20)
 
             workbook.close()
             output.seek(0)
             attachment_data = output.read()
 
-            # Załącznik do maila
+            # === Tworzenie załącznika w Odoo ===
             attachment = self.env['ir.attachment'].create({
-                'name': f'Raport_{campaign.name}.xlsx',
+                'name': f'Raport_{campaign.name}_z_dnia_{campaign.date_start.strftime("%Y-%m-%d %H:%M:%S")}.xlsx',
                 'type': 'binary',
                 'datas': base64.b64encode(attachment_data),
                 'res_model': 'sms.campaign',
@@ -257,14 +298,14 @@ class SmsCampaign(models.Model):
                     <table style="width:100%;max-width:600px;margin:auto;font-family:Arial,sans-serif;border-collapse:collapse;">
                       <tr>
                         <td style="background:#2c7be5;color:white;padding:16px;font-size:20px;font-weight:bold;">
-                          📊 Raport kampanii SMS – <span style="color:#ffdd57;">{campaign.name}</span>
+                          📊 Raport kampanii SMS – <span style="color:#ffdd57;">{campaign.name} z dnia {campaign.date_start.strftime("%Y-%m-%d %H:%M:%S")}</span>
                         </td>
                       </tr>
                       <tr>
                         <td style="background:#f9f9f9;padding:20px;">
                           <p style="font-size:15px;color:#333;">
                             Dzień dobry,<br><br>
-                            Poniżej znajduje się podsumowanie kampanii <b>{campaign.name}</b>.
+                            Poniżej znajduje się podsumowanie kampanii <b>{campaign.name} z dnia {campaign.date_start.strftime("%Y-%m-%d %H:%M:%S")}</b>.
                             Pełny raport znajdziesz w załączniku w formacie Excel.
                           </p>
 
@@ -278,12 +319,12 @@ class SmsCampaign(models.Model):
                               <td style="border:1px solid #ddd;padding:8px;">{campaign.date_end.strftime('%Y-%m-%d %H:%M:%S') if campaign.date_end else '-'}</td>
                             </tr>
                             <tr>
-                              <td style="border:1px solid #ddd;padding:8px;background:#f1f1f1;">✉️ Wysłane wiadomości</td>
-                              <td style="border:1px solid #ddd;padding:8px;">{campaign.sent_count}</td>
+                              <td style="border:1px solid #ddd;padding:8px;background:#f1f1f1;">✉️ Wszystkich wiadomości</td>
+                              <td style="border:1px solid #ddd;padding:8px;">{campaign.message_count}</td>
                             </tr>
                             <tr>
                               <td style="border:1px solid #ddd;padding:8px;background:#f1f1f1;">📬 Dostarczone</td>
-                              <td style="border:1px solid #ddd;padding:8px;color:green;font-weight:bold;">{campaign.delivered_count}</td>
+                              <td style="border:1px solid #ddd;padding:8px;color:green;font-weight:bold;">{campaign.sent_count}</td>
                             </tr>
                             <tr>
                               <td style="border:1px solid #ddd;padding:8px;background:#f1f1f1;">⚠️ Niedostarczone</td>
@@ -309,9 +350,9 @@ class SmsCampaign(models.Model):
                     </table>
                     """
 
-            # Wysyłka maila
+            # === Wysyłka maila ===
             self.env['mail.mail'].create({
-                'subject': f'Raport kampanii SMS: {campaign.name}',
+                'subject': f'Raport kampanii SMS: {campaign.name} z dnia {campaign.date_start.strftime("%Y-%m-%d %H:%M:%S")}',
                 'body_html': body_html,
                 'email_to': user.stats_email,
                 'email_from': 'smsrapo@poxbox.pl' or 'no-reply@example.com',

@@ -43,6 +43,14 @@ class SmsMessage(models.Model):
     sms_gateway_response = fields.Text(string='SMS Gateway Response')
     sms_gateway_response_human = fields.Text(string='Potwierdzenie dostarczenia')
     sms_reply_number = fields.Integer(string='Retry Count', default=0, help='Ilość ponownych prób wysyłki')
+    sms_message_count = fields.Integer(string='Message Count', default=0, help='Ilość wiadomości')
+
+    user_id = fields.Many2one(
+        'res.users',
+        string='Użytkownik',
+        default=lambda self: self.env.user,
+        required=True
+    )
 
 
     def _get_available_sender_numbers(self):
@@ -98,13 +106,25 @@ class SmsMessage(models.Model):
 
     @api.model
     def _call_api(self, method, payload):
-        #endpoint = f"{self.API_URL.rstrip('/')}/smsapi/{method}"
-        user = self.env.user
-        #url = user.sms_api_endpoint or ''
+        # Ustal użytkownika przypisanego do rekordu SMS
+        if hasattr(self, 'user_id') and self.user_id:
+            user = self.user_id
+        else:
+            # Fallback na aktualnego użytkownika (np. z przycisku)
+            user = self.env.user
+
+        # Ustal endpoint
         url = user.sms_api_endpoint or 'https://skademo.poxbox.pl/'
         endpoint = f"{url.rstrip('/')}/smsapi/{method}"
+
+        # Dodaj dane logowania do payload
         payload['username'] = user.sms_api_user
         payload['password'] = user.sms_api_password
+
+        _logger.info("Call API as user %s", user.login)
+        _logger.debug("API USER: %s", user.sms_api_user)
+        _logger.debug("API PASS: %s", user.sms_api_password)
+
         try:
             resp = requests.post(endpoint, json=payload, timeout=15)
             resp.raise_for_status()
@@ -194,6 +214,7 @@ class SmsMessage(models.Model):
             return False
 
         smsid = result['msg_details'][0].get('smsid')
+        msglength = result['msg_details'][0].get('msglength')
         if not smsid:
             _logger.error("Brak smsid w odpowiedzi API dla numeru %s", phone_number)
             return {'initial_reply': result, 'delivery_status': 'unknown'}
@@ -222,6 +243,7 @@ class SmsMessage(models.Model):
             'external_id': smsid,
             'initial_reply': result,
             'delivery_status': status,
+            'sms_message_count': msglength,
         }
 
 
@@ -247,7 +269,7 @@ class SmsMessage(models.Model):
                 detail = result['msg_details'][0]
                 msg.write({
                     'external_id':          detail.get('smsid'),
-                    #'sms_gateway_response': detail,
+                    'sms_message_count':    detail.get('msglength'),
                     'state':                'sent',
                 })
             else:
@@ -316,15 +338,31 @@ class SmsMessage(models.Model):
             if msg.sms_gateway_response and msg.sms_gateway_response.lower() == 'wysyłka zakończona sukcesem':
                 continue
 
+            api_user = msg.user_id.sms_api_user
+            api_password = msg.user_id.sms_api_password
+
+            _logger.info("Jestem w poll_delivery_status user %s", api_user)
+            _logger.info("Jestem w poll_delivery_status pass %s", api_password)
+
+            if not api_user or not api_password:
+                _logger.warning("Brak danych API dla użytkownika %s", msg.user_id.name)
+                continue
             # 3) pobieramy aktualny status z API
             payload = {
+                'username': api_user,
+                'password': api_password,
                 'messageids': [msg.external_id],
                 'extended_view': 'sms_details',
             }
             try:
+                _logger.info("Co wysyłam do bramki %s", payload)
                 result = msg._call_api('retrieve_sent_sms_by_ids', payload)
             except Exception as e:
                 _logger.warning("Błąd API retrieve_sent_sms_by_ids dla %s: %s", msg.external_id, e)
+                continue
+
+            if not isinstance(result, dict):
+                _logger.warning("Niepoprawna odpowiedź API dla %s: %s", msg.external_id, result)
                 continue
 
             messages = result.get('messages') or []
@@ -404,49 +442,5 @@ class SmsMessage(models.Model):
                 )
                 campaign.send_excel_report_by_email()
 
-    def poll_delivery_status_all(self):
-        _logger.info("Jestem w poll_delivery_status_all !!!!!!!!!!!!!!")
-        to_check = self.search([
-            ('external_id', '!=', False),
-            ('state', '=', 'sent')
-        ])
-        for msg in to_check:
-            payload = {
-               # 'username': self.API_USERNAME,
-              #  'password': self.API_PASSWORD,
-                # Pobieramy zwrot po konkretnym external_id
-                'messageids': [msg.external_id],
 
-            }
-            try:
-                result = self._call_api('retrieve_sent_sms_by_ids', payload)
-            except Exception as e:
-                _logger.info("Błąd API retrieve_sent_sms_by_ids dla %s: %s", msg.external_id, e)
-                continue
-
-            messages = result.get('messages') or []
-            if not messages:
-                _logger.warning("Brak danych statusu dla SMS %s", msg.external_id)
-                continue
-
-            info = messages[0]
-            status = (info.get('status') or '').lower()
-
-            # sukces
-            if 'zakończona sukcesem' in status or 'potwierdziło wysyłkę' in status:
-               # msg.state = 'delivered'
-                msg.sms_gateway_response_human = 'Dostarczono'
-                msg.sms_gateway_response = status
-            # błąd
-            elif 'zakończona błędem' in status or 'odrzuciło wysyłkę' in status:
-                msg.sms_gateway_response_human = 'Nie Dostarczono'
-                msg.sms_gateway_response = status
-            # kolejka
-            elif 'zakolejkowan' in status:
-                msg.sms_gateway_response_human = 'Nie Dostarczono'
-                msg.sms_gateway_response = status
-            else:
-                msg.sms_gateway_response_human = 'Nie Dostarczono'
-                msg.sms_gateway_response = status
-                _logger.info("Nieznany status SMS %s: %s", msg.external_id, status)
 

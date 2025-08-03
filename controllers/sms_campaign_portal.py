@@ -295,6 +295,7 @@ class SmsCampaignPortal(http.Controller):
                     'partner_id': partner.id,
                     'body': campaign.single_message,
                     'state': 'draft',
+                    'user_id': request.env.user.id,
                 })
                 created += 1
 
@@ -327,46 +328,83 @@ class SmsCampaignPortal(http.Controller):
         if not campaign.exists():
             return request.not_found()
 
-        # Filtrujemy tylko wysłane SMS-y
-        messages = campaign.message_ids.filtered(lambda m: m.state == 'sent')
+        messages = campaign.message_ids
 
         # Przygotowanie pliku XLSX w pamięci
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-        sheet = workbook.add_worksheet("Wysłane SMS")
+        sheet = workbook.add_worksheet("Raport SMS")
 
-        # Nagłówki
+        # === Style ===
+        title_format = workbook.add_format({
+            'bold': True, 'font_size': 16, 'align': 'center', 'valign': 'vcenter'
+        })
+        stat_label_format = workbook.add_format({
+            'bold': True, 'bg_color': '#DCE6F1', 'border': 1
+        })
+        stat_value_format = workbook.add_format({
+            'border': 1
+        })
+        header_format = workbook.add_format({
+            'bold': True, 'bg_color': '#4F81BD', 'font_color': 'white', 'border': 1
+        })
+        row_format_1 = workbook.add_format({'border': 1, 'bg_color': '#FFFFFF'})
+        row_format_2 = workbook.add_format({'border': 1, 'bg_color': '#F2F2F2'})
+
+        # === Tytuł raportu ===
+        #sheet.merge_range('A1:H1', f"Raport SMS - {campaign.name}", title_format)
+        sheet.merge_range('A1:H1',
+                          f"Raport SMS dla - {campaign.name} z dnia {campaign.date_start.strftime('%Y-%m-%d %H:%M:%S')}",
+                          title_format)
+
+        # === Sekcja statystyk ===
+        stats = [
+            ['Wiadomości ogółem', campaign.message_count],
+            ['Wysłane', campaign.sent_count],
+            ['Dostarczone', campaign.delivered_count],
+            ['Nieudane', campaign.failed_count],
+            ['Wskaźnik dostarczenia (%)', f"{campaign.delivery_rate:.2f}"]
+        ]
+        stat_row_start = 2
+        for row_idx, (label, value) in enumerate(stats, start=stat_row_start):
+            sheet.write(row_idx, 0, label, stat_label_format)
+            sheet.write(row_idx, 1, value, stat_value_format)
+
+        # === Nagłówki tabeli ===
+        start_row = stat_row_start + len(stats) + 2
         headers = [
-            'Lp.', 'Data zaplanowana', 'Numer odbiorcy', 'Treść wiadomości',
-            'External ID', 'Odpowiedź bramki', 'Status'
+            'Lp.', 'Numer odbiorcy', 'Treść wiadomości', 'Ilość znaków',
+            'Ilość wiadomości', 'Status', 'Odpowiedź bramki', 'Ilość prób wysyłki'
         ]
         for col, title in enumerate(headers):
-            sheet.write(0, col, title)
+            sheet.write(start_row, col, title, header_format)
 
-        # Wypełniamy wiersze danymi
-        for row, msg in enumerate(messages, start=1):
-            sheet.write(row, 0, row)
-            # date_scheduled to datetime lub False
-            sheet.write(row, 1, msg.date_scheduled.strftime('%Y-%m-%d %H:%M:%S')
-            if msg.date_scheduled else '')
-            sheet.write(row, 2, msg.partner_id.phone or '')
-            sheet.write(row, 3, msg.body or '')
-            sheet.write(row, 4, msg.external_id or '')
-            sheet.write(row, 5, msg.sms_gateway_response or '')
-            sheet.write(row, 6, msg.sms_gateway_response_human or '')
-            sheet.write(row, 7, msg.state)
+        # === Dane tabeli ===
+        for row, msg in enumerate(messages, start=start_row + 1):
+            fmt = row_format_1 if (row - start_row) % 2 else row_format_2
+            sheet.write(row, 0, row - start_row, fmt)
+            sheet.write(row, 1, msg.partner_id.phone or '', fmt)
+            sheet.write(row, 2, msg.body or '', fmt)
+            sheet.write(row, 3, msg.char_count or '', fmt)
+            sheet.write(row, 4, msg.sms_message_count or '', fmt)
+            sheet.write(row, 5, msg.state or '', fmt)
+            sheet.write(row, 6, msg.sms_gateway_response_human or '', fmt)
+            sheet.write(row, 7, msg.sms_reply_number or '', fmt)
+
+        # Auto-dopasowanie kolumn
+        for col in range(len(headers)):
+            sheet.set_column(col, col, 20)
 
         workbook.close()
         output.seek(0)
         data = output.read()
 
         # Przygotowanie odpowiedzi HTTP z załącznikiem
-        filename = f"sms_campaign_{campaign.id}_messages.xlsx"
+        filename = f"Raport_{campaign.name}_z_dnia_{campaign.date_start.strftime('%Y-%m-%d %H:%M:%S')}.xlsx"
         return request.make_response(
             data,
             headers=[
-                ('Content-Type',
-                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+                ('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
                 ('Content-Disposition', content_disposition(filename))
             ]
         )
