@@ -105,6 +105,85 @@ class SmsMessage(models.Model):
             self.body = self.template_id.body
 
     @api.model
+    @api.model
+    def read_incoming_messages(self, destination_numbers=None, source_number=None, contains=None, limit=None):
+        """
+        Prosta metoda: czyta przychodzące SMS-y przez REST (query_recv_messages) i zwraca listę dictów.
+        Parametry (wszystkie opcjonalne):
+          - destination_numbers: str lub lista str (nasze numery nadawcze / docelowe po stronie bramki)
+          - source_number: str (numer klienta/nadawcy)
+          - contains: str (szukany fragment w treści wiadomości)
+          - limit: int (maksymalna liczba elementów do zwrócenia po stronie Odoo)
+
+        Zwraca: listę elementów z kluczami m.in.:
+          smsid, source_number, destination_number, status, message, error
+        """
+        import json  # jeśli nie masz globalnego importu
+        criteria = []
+
+        # 1) zbuduj criteria zgodnie z API
+        if destination_numbers:
+            if isinstance(destination_numbers, str):
+                destination_numbers = [destination_numbers]
+            for dn in destination_numbers:
+                if dn:
+                    criteria.append({'destination_number': dn})
+
+        if source_number:
+            criteria.append({'source_number': source_number})
+
+        if contains:
+            criteria.append({'message': contains})
+
+        if not criteria:
+            _logger.info("read_incoming_messages: brak kryteriów (criteria) – zwracam pustą listę.")
+            return []
+
+        payload = {'criteria': criteria}
+
+        # 2) LOG: pokaż w logu CAŁE zapytanie, które pójdzie do serwera (endpoint + body)
+        #    _call_api wstrzykuje username/password, więc zbudujemy "efektywny" payload tutaj do logów
+        user = self.user_id or self.env.user
+        base_url = (user.sms_api_endpoint or 'https://skademo.poxbox.pl/').rstrip('/')
+        endpoint = f"{base_url}/smsapi/query_recv_messages"
+
+        effective_payload = dict(payload)
+        effective_payload['username'] = user.sms_api_user
+        effective_payload['password'] = user.sms_api_password
+
+        # zamaskuj hasło w logu
+        safe_payload = dict(effective_payload)
+        if 'password' in safe_payload and safe_payload['password']:
+            safe_payload['password'] = '***'
+
+        _logger.info(
+            "read_incoming_messages → POST %s | body=%s",
+            endpoint,
+            json.dumps(safe_payload, ensure_ascii=False)
+        )
+
+        # 3) call – _call_api doda username/password do realnego requestu i zaloguje response
+        res = self._call_api('query_recv_messages', payload)
+
+        # 4) walidacja i zwrot + LOG odpowiedzi (skrót)
+        if not isinstance(res, dict):
+            _logger.warning("read_incoming_messages ← niepoprawna odpowiedź z API: %s", res)
+            return []
+
+        # opcjonalny skrót odpowiedzi w logu (do 2k znaków)
+        try:
+            resp_str = json.dumps(res, ensure_ascii=False)
+            _logger.info("read_incoming_messages ← response=%s",
+                         resp_str[:2000] + ('…' if len(resp_str) > 2000 else ''))
+        except Exception:
+            _logger.info("read_incoming_messages ← response(dict) z %d rekordami", len(res.get('messages') or []))
+
+        items = res.get('messages') or []
+        if limit and isinstance(limit, int) and limit > 0:
+            items = items[:limit]
+        return items
+
+    @api.model
     def _call_api(self, method, payload):
         # Ustal użytkownika przypisanego do rekordu SMS
         if hasattr(self, 'user_id') and self.user_id:
@@ -126,54 +205,12 @@ class SmsMessage(models.Model):
         _logger.debug("API PASS: %s", user.sms_api_password)
 
         try:
-            resp = requests.post(endpoint, json=payload, timeout=15)
+            resp = requests.get(endpoint, json=payload, timeout=15)
             resp.raise_for_status()
             return resp.json()
         except Exception as e:
             _logger.error('%s error: %s', method, e)
             return False
-
-    @api.model
-    def send_sms_to_number_old(self, phone_number, message_text, sender_number=None, scheduled_date=None):
-        """
-        Send a single SMS to the given phone number.
-        :param phone_number: numer telefonu (string), np. '+48123456789'
-        :param message_text: treść wiadomości
-        :param sender_number: (opcjonalnie) numer nadawcy,
-                              jeśli nie podano, użyty zostanie domyślny
-        :param scheduled_date: (opcjonalnie) datetime, jeśli chcesz zaplanować wysyłkę
-        :return: odpowiedź z API (dict) lub False przy błędzie
-        """
-        if not phone_number:
-            _logger.error("Brak numeru telefonu do wysłania SMS")
-            return False
-
-        # wybór numeru nadawcy
-        sender = sender_number or self._get_default_sender_number()
-
-        # przygotowanie wiadomości
-        msg = {
-            'destination_number': phone_number,
-            'text': message_text,
-        }
-        payload = {
-           # 'username': self.API_USERNAME,
-           # 'password': self.API_PASSWORD,
-            'messages': [msg],
-            'extended_view': 'sms_details',
-        }
-        # jeśli chcemy zaplanować wysyłkę
-        if scheduled_date:
-            payload['sch_date'] = scheduled_date.strftime('%Y-%m-%d %H:%M:%S')
-
-        # wywołanie API
-        result = self._call_api('send_multi_sms', payload)
-        if not result or not result.get('msg_details'):
-            _logger.error("Wysyłka SMS nie powiodła się dla numeru %s", phone_number)
-            _logger.error(result)
-            return False
-
-        return result
 
     @api.model
     def send_sms_to_number(self, phone_number, message_text, sender_number=None, scheduled_date=None):
@@ -196,7 +233,9 @@ class SmsMessage(models.Model):
 
         sender = sender_number or self._get_default_sender_number()
 
-        msg = {'destination_number': phone_number, 'text': message_text}
+        msg = {'destination_number': phone_number,
+               'text': message_text,
+               'source_number': sender,}
         payload = {
            # 'username': self.API_USERNAME,
            # 'password': self.API_PASSWORD,
@@ -249,6 +288,7 @@ class SmsMessage(models.Model):
 
 
     def action_send_now(self):
+        sender = self._get_default_sender_number()
         """Wyślij tę wiadomość przez API i zaktualizuj external_id, sms_gateway_response i state."""
         for msg in self.filtered(lambda m: m.state in ('draft', 'scheduled')):
             # Budowa payload
@@ -257,7 +297,8 @@ class SmsMessage(models.Model):
                # 'password': self.API_PASSWORD,
                 'messages': [{
                     'destination_number': msg.partner_id.phone,
-                    'text': msg.body
+                    'text': msg.body,
+                    'source_number': sender,
                 }],
                 'extended_view': 'sms_details',
             }
@@ -298,6 +339,36 @@ class SmsMessage(models.Model):
         for msg in self:
             if msg.state == 'draft':
                 msg.state = 'scheduled'
+
+    def _save_incoming_to_conversation(self, src_number, dst_number, body, external_id, event_date=None):
+        Partner = self.env['res.partner'].sudo()
+        Conversation = self.env['sms.conversation'].sudo()
+        Line = self.env['sms.conversation.line'].sudo()
+
+        # partner po numerze nadawcy (klient)
+        partner = Partner.search([('phone', '=', src_number)], limit=1)
+        if not partner:
+            partner = Partner.create({'name': src_number, 'phone': src_number})
+
+        # konwersacja po partnerze
+        conv = Conversation.search([('partner_id', '=', partner.id)], limit=1)
+        if not conv:
+            conv = Conversation.create({'partner_id': partner.id})
+
+        # uniknij duplikatu po external_id (smsid)
+        if external_id and Line.search([('external_id', '=', str(external_id))], limit=1):
+            return
+
+        Line.create({
+            'conversation_id': conv.id,
+            'body': body or '',
+            'direction': 'in',
+            'status': 'delivered',
+            'external_id': str(external_id) if external_id else False,
+            'date': event_date or fields.Datetime.now(),
+        })
+        _logger.info("Zapisano odpowiedź SMS (IN): %s -> %s, conv=%s, smsid=%s",
+                     src_number, dst_number, conv.id, external_id)
 
     @api.model
     def send_sms_batch(self):
@@ -394,6 +465,7 @@ class SmsMessage(models.Model):
                 tries = msg.sms_reply_number or 0
                 if tries < 3:
                     next_send = datetime.now() + timedelta(minutes=10)
+                    self.read_incoming_messages(destination_numbers='609224226')
                     msg.write({
                         'sms_reply_number': tries + 1,
                         'state': 'sent',

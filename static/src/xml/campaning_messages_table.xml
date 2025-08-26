@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+  <t t-name="odoo17_sms_plugin.CampaignMessagesTable">
+    <div class="container">
+      <h3 class="mt-2 mb-2">Wiadmosci</h3>
+
+      <div class="d-flex justify-content-between mb-2 mt-2">
+        <input t-ref="body" type="text" class="form-control"
+               t-on-keyup="(e)=>this.searchMessages(e)"/>
+        <button class="btn btn-primary oi oi-search mx-2"
+                t-on-click="searchMessages"/>
+      </div>
+      <div style="max-height: 500px; overflow-y: auto;">
+        <table class="table">
+          <thead class="sticky-top bg-dark text-white">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Numer</th>
+              <th scope="col">Odpowiedź z bramki</th>
+              <th scope="col">...</th>
+            </tr>
+          </thead>
+          <tbody>
+            <t t-foreach="paginatedMessages()" t-as="partner" t-key="partner.id">
+              <tr>
+                <th scope="row">
+                  <span t-esc="((state.currentPage-1)*state.pageSize) + (partner_index+1)"/>
+                </th>
+                <td><t t-esc="partner.body or '-'"/></td>
+                <td><t t-esc="partner.sms_gateway_response_human or '-'"/></td>
+                <td>..</td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+      <!-- Kontrolki paginacji -->
+      <nav aria-label="Pagination">
+        <ul class="pagination justify-content-center mt-3">
+          <li class="page-item" t-att-class="{'disabled': state.currentPage === 1}">
+            <a class="page-link" href="#" t-on-click.prevent="prevPage">Poprzednia</a>
+          </li>
+          <t t-foreach="Array(totalPages()).fill().map((_, i) => i + 1)"
+   t-as="pageNum"
+   t-key="pageNum">
+  <li class="page-item" t-att-class="{'active': state.currentPage === pageNum}">
+    <a class="page-link"
+       href="#"
+       t-on-click.prevent="()=>this.goToPage(pageNum)">
+      <t t-esc="pageNum"/>
+    </a>
+  </li>
+</t>
+          <li class="page-item"
+              t-att-class="{'disabled': state.currentPage === totalPages()}">
+            <a class="page-link" href="#" t-on-click.prevent="nextPage">Następna</a>
+          </li>
+        </ul>
+      </nav>
+
+    </div>
+  </t>
+</templates>

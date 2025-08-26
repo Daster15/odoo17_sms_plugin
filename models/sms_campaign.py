@@ -37,9 +37,23 @@ class SmsCampaign(models.Model):
         default=lambda self: self._get_available_campaning_sender_numbers()
     )
 
+    # NOWE: właściciel kampanii
+    user_id = fields.Many2one(
+        'res.users', string='Owner', required=True,
+        default=lambda self: self.env.user, index=True
+    )
+
     report_sent = fields.Boolean(string='Raport wysłany', default=False)
 
-    def _get_available_campaning_sender_numbers(self):
+
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            vals.setdefault('user_id', self.env.user.id)
+        return super().create(vals_list)
+
+    def _get_available_campaning_sender_numbers_old(self):
         """Zwraca listę dostępnych numerów nadawcy"""
         return [
             ('+48123456789', 'CLIP (POXBOX)'),
@@ -47,6 +61,11 @@ class SmsCampaign(models.Model):
             ('+48111222333111111111', 'Support (+48 600 200 21100)')
         ]
 
+    def _get_available_campaning_sender_numbers(self):
+        """Zwraca listę (value, label) numerów nadawcy przypisanych do bieżącego użytkownika."""
+        user = self.env.user
+        numbers = user.sender_number_ids
+        return [(rec.number, rec.number) for rec in numbers] or []
 
     # Pola statystyczne
 

@@ -12,3 +12,21 @@
     max-height: 200px;
     overflow-y: auto;
 }
+
+@use "sass:map";
+@use "web/static/src/scss/variables" as *;
+
+$primary: $o-brand-primary;
+$secondary: $o-brand-secondary;
+
+.card.shadow-sm {
+  transition: box-shadow .2s ease-in-out;
+
+  &.hover-shadow:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+  }
+}
+
+.navbar-brand {
+  font-weight: 600;
+}

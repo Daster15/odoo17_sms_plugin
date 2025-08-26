@@ -466,22 +466,23 @@
                 </form>
 
                 <!-- Akcje na wiadomościach: usuń numery -->
-                <div class="mt-3">
+                <!--
+                  <div class="mt-3">
                   <form t-att-action="'/my/sms_campaigns/%d/clear_numbers' % campaign.id" method="post">
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                     <button type="submit" class="btn btn-outline-danger">Usuń wszystkie numery</button>
                   </form>
                 </div>
+                  -->
 
                 <!-- Tabela wiadomości -->
+                  <!--
                 <div class="mt-3">
                   <h5>Wiadomości w kampanii</h5>
                   <table class="table table-hover mb-0">
                     <thead class="table-light">
                       <tr>
                         <th class="py-2">Numer</th>
-                        <!--<th class="py-2">Treść</th>
-                        <th class="py-2">External ID</th>-->
                         <th class="py-">Odpowiedź bramki</th>
                         <th class="py-2 text-end">Status</th>
                       </tr>
@@ -490,8 +491,6 @@
                       <t t-foreach="campaign.message_ids" t-as="msg">
                         <tr>
                           <td class="py-2 small"><t t-esc="msg.partner_id.phone or '-'"/></td>
-                          <!--<td class="py-2"><div class="text-truncate" style="max-width:200px;" t-esc="msg.body"/></td>
-                          <td class="py-2 small"><t t-esc="msg.external_id or '-'"/></td>-->
                           <td class="py-2"><div class="text-truncate" t-esc="msg.sms_gateway_response_human or '-'"/></td>
                           <td class="py-2 text-end">
                             <span class="badge text-uppercase py-1" t-att-class="{
@@ -514,7 +513,9 @@
                       </t>
                     </tbody>
                   </table>
+
                 </div>
+                  -->
 
               </div>
             </div>
@@ -565,56 +566,13 @@
 
                         <!-- Wiadomości -->
                         <div class="card border-0 shadow-sm">
-                            <div class="card-header bg-white border-bottom py-3">
-                                <h5 class="mb-0">Wiadomości</h5>
-                            </div>
+
                             <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-hover mb-0">
-    <thead class="table-light">
-        <tr>
-            <th class="py-2">Numer</th>
-            <!--<th class="py-2">Treść</th>
-            <th class="py-2">External ID</th>-->
-            <th class="py-2">Odpowiedź bramki</th>
-            <th class="py-2 text-end">Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        <t t-foreach="campaign.message_ids" t-as="msg">
-            <tr>
-                <!-- numer telefonu -->
-                <td class="py-2 small">
-                    <t t-esc="msg.partner_id.phone or '-'"/>
-                </td>
-
-                <td class="py-2">
-                    <div class="text-truncate" t-esc="msg.sms_gateway_response_human or '-'"/>
-                </td>
-                <!-- status -->
-                <td class="py-2 text-end">
-                    <span class="badge text-uppercase py-1" t-att-class="{
-                        'draft':'bg-secondary-soft text-secondary',
-                        'scheduled':'bg-info-soft text-info',
-                        'sent':'bg-primary-soft text-primary',
-                        'delivered':'bg-success-soft text-success',
-                        'failed':'bg-danger-soft text-danger'
-                    }[msg.state]">
-                        <t t-esc="{
-                            'draft':'Oczekujące',
-                            'scheduled':'Zaplanowane',
-                            'sent':'Wysłane',
-                            'delivered':'Dostarczone',
-                            'failed':'Nieudane'
-                        }[msg.state]"/>
-                    </span>
-                </td>
-            </tr>
-        </t>
-    </tbody>
-</table>
-
-                                </div>
+<t t-set="cmProps" t-value="{'campaign_id': campaign.name}"/>
+<owl-component
+    name="odoo17_sms_plugin.CampaignMessagesTable"
+    t-props="cmProps"
+/>
                             </div>
                         </div>
 
@@ -632,7 +590,7 @@
                                         <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                         <div class="col-md-8">
                                             <input type="file" name="csv_file" accept=".csv" class="form-control form-control-sm"/>
-                                            <small class="text-muted">Akceptowane formaty: CSV z kolumnami 'phone_numer' (wersja demo do 10 rekordów)</small>
+                                            <small class="text-muted">Plik importu CSV musi zawierać kolumnę z numerami o nazwie: 'phone_numer/numer_odbiorcy/numer_telefonu/numer' (wersja demo do 10 rekordów)</small>
                                         </div>
                                         <div class="col-md-4">
                                             <button type="submit" class="btn btn-primary w-100">Importuj</button>

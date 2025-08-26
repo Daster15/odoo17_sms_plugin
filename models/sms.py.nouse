@@ -1,0 +1,495 @@
+# -*- coding: utf-8 -*-
+from odoo import models, fields, api
+import logging
+import requests
+import re
+import copy
+from datetime import datetime, timedelta
+from odoo.tools.safe_eval import safe_eval
+
+_logger = logging.getLogger(__name__)
+
+
+class SmsMessage(models.Model):
+    _name = 'sms.message'
+    _description = 'SMS Message'
+
+    # --- Pola podstawowe ---
+    template_id = fields.Many2one('sms.template', string='Template', help='Select SMS template')
+    body = fields.Text(string='Message', required=True)
+    char_count = fields.Integer(string='Chars', compute='_compute_char_count', store=True)
+
+    partner_id = fields.Many2one('res.partner', string='Customer', index=True)
+    group_ids = fields.Many2many('res.partner', string='Customer Groups')
+    campaign_id = fields.Many2one('sms.campaign', string='Campaign', index=True)
+
+    date_scheduled = fields.Datetime(string='Scheduled Date', index=True)
+
+    state = fields.Selection([
+        ('draft', 'Oczekujące'),
+        ('scheduled', 'Zaplanowane'),
+        ('sent', 'Wysłane'),
+        ('delivered', 'Dostarczone'),
+        ('failed', 'Nieudane')
+    ], default='draft', index=True)
+
+    message_type = fields.Selection(
+        [('sms', 'SMS'), ('notification', 'Notification')],
+        string='Message Type',
+        default='sms'
+    )
+
+    external_id = fields.Char(string='External SMS ID', help='ID from SMS provider')
+
+    sender_number = fields.Selection(
+        selection='_get_available_sender_numbers',
+        string='Sender Number',
+        required=True,
+        default=lambda self: self._get_default_sender_number()
+    )
+
+    # Surowa odpowiedź z bramki (pozostawione dla kompatybilności)
+    sms_gateway_response = fields.Text(string='SMS Gateway Response')
+    sms_gateway_response_human = fields.Text(string='Potwierdzenie dostarczenia')
+
+    # Retry licznik (pozostawiony dla kompatybilności)
+    sms_reply_number = fields.Integer(string='Retry Count', default=0, help='Ilość ponownych prób wysyłki')
+
+    # Ile segmentów ma wysłana wiadomość
+    sms_message_count = fields.Integer(string='Message Count', default=0, help='Ilość wiadomości')
+
+    # Użytkownik (z jego ustawień bierzemy endpoint, login i hasło)
+    user_id = fields.Many2one(
+        'res.users',
+        string='Użytkownik',
+        default=lambda self: self.env.user,
+        required=True
+    )
+
+    # --- NOWE: oznaczanie, że jest odpowiedź od klienta ---
+    has_reply = fields.Boolean(string='Odpowiedź otrzymana', default=False, index=True)
+    last_reply_text = fields.Text(string='Ostatnia odpowiedź')
+    last_reply_date = fields.Datetime(string='Data ostatniej odpowiedzi')
+
+    # ------------------------------------------------------
+    # Wybór numerów nadawcy z profilu użytkownika
+    # ------------------------------------------------------
+    def _get_available_sender_numbers(self):
+        """Zwraca listę tuple (value, label) z numerami nadawcy zdefiniowanymi dla zalogowanego użytkownika."""
+        numbers = self.env.user.sender_number_ids
+        return [(rec.number, rec.number) for rec in numbers]
+
+    def _get_default_sender_number(self):
+        """Zwraca domyślny numer nadawcy (pierwszy dostępny)."""
+        numbers = self._get_available_sender_numbers()
+        return numbers[0][0] if numbers else False
+
+    # ------------------------------------------------------
+    # Onchange – podstawianie treści szablonu + render {{ ... }}
+    # (NIE zmieniamy nazwy istniejącej metody)
+    # ------------------------------------------------------
+    @api.onchange('template_id', 'partner_id', 'campaign_id')
+    def _onchange_template(self):
+        """Po wybraniu szablonu podstaw body i wyrenderuj {{ … }} z użyciem safe_eval."""
+        for rec in self:
+            if not rec.template_id:
+                rec.body = False
+                continue
+            raw_body = rec.template_id.body or ''
+            pattern = re.compile(r'{{\s*(.*?)\s*}}')
+
+            def _replace(match):
+                expr = match.group(1)
+                try:
+                    value = safe_eval(expr, {'object': rec})
+                    return str(value or '')
+                except Exception:
+                    return match.group(0)
+
+            rec.body = pattern.sub(_replace, raw_body)
+            rec._compute_char_count()
+
+    @api.depends('body')
+    def _compute_char_count(self):
+        for rec in self:
+            rec.char_count = len(rec.body or '')
+
+    # ------------------------------------------------------
+    # REST API – wspólne wywołanie + logowanie
+    # (NIE zmieniamy nazwy istniejącej metody)
+    # ------------------------------------------------------
+    def _mask_payload_for_log(self, payload):
+        """Zwraca kopię payloadu z zamaskowanym hasłem na potrzeby logów."""
+        try:
+            safe = copy.deepcopy(payload or {})
+        except Exception:
+            safe = dict(payload or {})
+        if isinstance(safe, dict) and 'password' in safe:
+            safe['password'] = '***'
+        return safe
+
+    @api.model
+    def _call_api(self, method, payload):
+        """Wywołanie REST API z danymi pochodzącymi z ustawień użytkownika powiązanego z rekordem."""
+        # Ustal użytkownika przypisanego do rekordu SMS
+        if hasattr(self, 'user_id') and self.user_id:
+            user = self.user_id
+        else:
+            user = self.env.user
+
+        # Ustal endpoint
+        url = user.sms_api_endpoint or 'https://skademo.poxbox.pl/'
+        endpoint = f"{url.rstrip('/')}/smsapi/{method}"
+
+        # Dodaj dane logowania do payload
+        payload = dict(payload or {})
+        payload['username'] = user.sms_api_user
+        payload['password'] = user.sms_api_password
+
+        safe_payload = self._mask_payload_for_log(payload)
+        _logger.debug("API %s → %s | payload=%s", method, endpoint, safe_payload)
+
+        try:
+            resp = requests.post(endpoint, json=payload, timeout=15)
+            try:
+                resp.raise_for_status()
+            except requests.HTTPError:
+                _logger.error("API %s ← HTTP %s | response=%s", method, resp.status_code, resp.text)
+                _logger.error("API %s request payload (masked)=%s", method, safe_payload)
+                raise
+
+            if method == 'query_recv_messages':
+                _logger.debug("API %s ← HTTP %s | response=%s", method, resp.status_code, resp.text)
+
+            return resp.json()
+        except Exception as e:
+            _logger.error('API %s error: %s | last_payload(masked)=%s', method, e, safe_payload)
+            return False
+
+    # ------------------------------------------------------
+    # Wysyłka
+    # ------------------------------------------------------
+    @api.model
+    def send_sms_to_number_old(self, phone_number, message_text, sender_number=None, scheduled_date=None):
+        """(Kompatybilność) Wysyłka pojedynczego SMS bez natychmiastowego sprawdzenia."""
+        if not phone_number:
+            _logger.error("Brak numeru telefonu do wysłania SMS")
+            return False
+
+        sender = sender_number or self._get_default_sender_number()
+
+        msg = {
+            'destination_number': phone_number,
+            'text': message_text,
+            'source_number': sender,
+        }
+        payload = {
+            'messages': [msg],
+            'extended_view': 'sms_details',
+        }
+        if scheduled_date:
+            payload['sch_date'] = scheduled_date.strftime('%Y-%m-%d %H:%M:%S')
+
+        result = self._call_api('send_multi_sms', payload)
+        if not result or not result.get('msg_details'):
+            _logger.error("Wysyłka SMS nie powiodła się dla numeru %s", phone_number)
+            _logger.error(result)
+            return False
+
+        return result
+
+    @api.model
+    def send_sms_to_number(self, phone_number, message_text, sender_number=None, scheduled_date=None):
+        """
+        Wysyłka pojedynczego SMS (REST).
+        Zwraca dict z 'external_id' oraz 'sms_message_count' (z extended_view).
+        """
+        if not phone_number:
+            _logger.error("Brak numeru telefonu do wysłania SMS")
+            return False
+
+        sender = sender_number or self._get_default_sender_number()
+
+        msg = {
+            'destination_number': phone_number,
+            'text': message_text,
+            'source_number': sender,
+        }
+        payload = {
+            'messages': [msg],
+            'extended_view': 'sms_details',
+        }
+        if scheduled_date:
+            payload['sch_date'] = scheduled_date.strftime('%Y-%m-%d %H:%M:%S')
+
+        result = self._call_api('send_multi_sms', payload)
+        if not result or not result.get('msg_details'):
+            _logger.error("Wysyłka SMS nie powiodła się dla numeru %s", phone_number)
+            _logger.error(result)
+            return False
+
+        smsid = result['msg_details'][0].get('smsid')
+        msglength = result['msg_details'][0].get('msglength')
+        return {
+            'external_id': smsid,
+            'initial_reply': result,
+            'delivery_status': 'sent',       # REST-only: nie używamy DLR
+            'sms_message_count': msglength,
+        }
+
+    def action_send_now(self):
+        """Wyślij tę wiadomość przez API i zaktualizuj external_id, sms_message_count i state."""
+        for msg in self.filtered(lambda m: m.state in ('draft', 'scheduled')):
+            payload = {
+                'messages': [{
+                    'destination_number': msg.partner_id.phone,
+                    'text': msg.body,
+                    'source_number': msg.sender_number,  # numer nadawcy MUSI iść do bramki
+                }],
+                'extended_view': 'sms_details',
+            }
+            result = msg._call_api('send_multi_sms', payload)
+            _logger.info(result)
+
+            if result and result.get('msg_details'):
+                detail = result['msg_details'][0]
+                msg.write({
+                    'external_id':          detail.get('smsid'),
+                    'sms_message_count':    detail.get('msglength'),
+                    'state':                'sent',
+                })
+            else:
+                msg.state = 'failed'
+
+    # ------------------------------------------------------
+    # (Pozostawione dla kompatybilności – nieużywane w REST-only)
+    # ------------------------------------------------------
+    def retrieve_gateway_response(self):
+        """(Opcjonalne, nieużywane w REST-only) Pobiera finalne informacje o dostarczeniu SMS-ów na podstawie external_id."""
+        smsids = [m.external_id for m in self if m.external_id]
+        if not smsids:
+            return
+        payload = {'messageids': smsids}
+        res = self._call_api('retrieve_sent_sms_by_ids', payload)
+        if not res or not res.get('messages'):
+            return
+        for info in res['messages']:
+            smsid = info.get('smsid')
+            msg = self.filtered(lambda m: m.external_id == smsid)
+            if msg:
+                msg.write({'sms_gateway_response': info})
+
+    def action_schedule(self):
+        for msg in self:
+            if msg.state == 'draft':
+                msg.state = 'scheduled'
+
+    @api.model
+    def send_sms_batch(self):
+        to_send = self.search([
+            ('state', '=', 'scheduled'),
+            ('date_scheduled', '<=', fields.Datetime.now())
+        ])
+        to_send.action_send_now()
+
+    @api.model
+    def poll_delivery_status_old(self):
+        """Stara wersja – pozostawiona w pliku; nieużywana w REST-only."""
+        to_check = self.search([('external_id', '!=', False), ('state', '=', 'sent')])
+        for msg in to_check:
+            payload = {'criteria': [{'destination_number': msg.partner_id.phone}]}
+            result = self._call_api('query_sent_messages', payload)
+            if result and result.get('messages'):
+                info = result['messages'][0]
+                status = info.get('status', '')
+                if status == 'wysyłka zakończona sukcesem':
+                    msg.state = 'delivered'
+                elif 'błąd' in status:
+                    msg.state = 'failed'
+
+    # ------------------------------------------------------
+    # POMOCNICZE: zapis przychodzącego SMS do Conversation i oznaczenie sms.message
+    # ------------------------------------------------------
+    def _save_incoming_to_conversation(self, src_number, dst_number, body, external_id, event_date=None):
+        """
+        Zapisuje linię IN do rozmowy i OZNACZA powiązaną wiadomość sms.message,
+        że pojawiła się odpowiedź (has_reply=True + last_reply_*).
+        """
+        Partner = self.env['res.partner'].sudo()
+        Conversation = self.env['sms.conversation'].sudo()
+        Line = self.env['sms.conversation.line'].sudo()
+        Message = self.env['sms.message'].sudo()
+
+        if not (src_number and body):
+            return
+
+        # partner po numerze nadawcy (klient)
+        partner = Partner.search([('phone', '=', src_number)], limit=1)
+        if not partner:
+            partner = Partner.create({'name': src_number, 'phone': src_number})
+
+        # konwersacja po partnerze
+        conv = Conversation.search([('partner_id', '=', partner.id)], limit=1)
+        if not conv:
+            conv = Conversation.create({'partner_id': partner.id})
+
+        # deduplikacja po external_id (smsid)
+        if external_id and Line.search_count([('external_id', '=', str(external_id))]):
+            # mimo duplikatu – uaktualnij flagę na sms.message
+            related_msg = Message.search([
+                ('partner_id', '=', partner.id),
+                ('sender_number', '=', dst_number),
+            ], order='create_date desc', limit=1)
+            if related_msg:
+                if 'has_reply' in Message._fields:
+                    related_msg.write({
+                        'has_reply': True,
+                        'last_reply_text': body,
+                        'last_reply_date': event_date or fields.Datetime.now(),
+                    })
+                else:
+                    related_msg.write({
+                        'sms_gateway_response_human': 'Odpowiedź',
+                        'sms_gateway_response': body,
+                    })
+            return
+
+        # utwórz linię IN
+        in_line = Line.create({
+            'conversation_id': conv.id,
+            'body': body,
+            'direction': 'in',
+            'status': 'delivered',
+            'external_id': str(external_id) if external_id else False,
+            'date': event_date or fields.Datetime.now(),
+        })
+
+        # znajdź najbardziej pasującą naszą wiadomość do oznaczenia
+        related_msg = Message.search([
+            ('partner_id', '=', partner.id),
+            ('sender_number', '=', dst_number),
+        ], order='create_date desc', limit=1) or Message.search([
+            ('partner_id', '=', partner.id),
+        ], order='create_date desc', limit=1)
+
+        if related_msg:
+            if 'has_reply' in Message._fields:
+                related_msg.write({
+                    'has_reply': True,
+                    'last_reply_text': body,
+                    'last_reply_date': in_line.date,
+                })
+            else:
+                related_msg.write({
+                    'sms_gateway_response_human': 'Odpowiedź',
+                    'sms_gateway_response': body,
+                })
+
+        _logger.info("IN SMS zapisany: %s -> %s, conv=%s, smsid=%s; oznaczono has_reply=%s (msg id: %s)",
+                     src_number, dst_number, conv.id, external_id, bool(related_msg), related_msg.id if related_msg else None)
+
+    def _get_user_sender_numbers(self, user):
+        """Lista numerów nadawcy przypisanych do usera (stringi)."""
+        nums = [rec.number for rec in (user.sender_number_ids or self.env['sms.user_sender_number'])]
+        if user.default_sender_number_id and user.default_sender_number_id.number:
+            if user.default_sender_number_id.number not in nums:
+                nums.append(user.default_sender_number_id.number)
+        return [n for n in nums if n]
+
+    # ------------------------------------------------------
+    # NOWE: pobieranie przychodzących z REST (query_recv_messages)
+    # ------------------------------------------------------
+    @api.model
+    def fetch_incoming_replies(self, users=None):
+        """
+        Pobiera SMS-y przychodzące z query_recv_messages dla numerów nadawcy
+        przypisanych do podanych użytkowników (lub użytkowników użytych w 'self').
+        """
+        _logger.info("fetch_incoming_replies – start")
+
+        # 1) Zbierz użytkowników
+        if users is None:
+            users = self.mapped('user_id')
+        else:
+            users = users if getattr(users, 'ids', False) else self.env['res.users'].browse([users.id])
+
+        if not users:
+            _logger.info("fetch_incoming_replies – brak użytkowników do obsługi")
+            return
+
+        Partner = self.env['res.partner'].sudo()
+        Conversation = self.env['sms.conversation'].sudo()
+        Line = self.env['sms.conversation.line'].sudo()
+        Message = self.env['sms.message'].sudo()
+
+        for user in users:
+            if not (user.sms_api_endpoint and user.sms_api_user and user.sms_api_password):
+                _logger.warning("fetch_incoming_replies – brak danych API dla usera %s", user.login)
+                continue
+
+            dest_numbers = self._get_user_sender_numbers(user)
+            if not dest_numbers:
+                _logger.info("fetch_incoming_replies – user %s nie ma skonfigurowanych numerów nadawcy", user.login)
+                continue
+
+            for dn in dest_numbers:
+                payload = {
+                    'criteria': [{'destination_number': dn}],
+                }
+                _logger.debug("fetch_incoming_replies: przygotowany payload=%s", self._mask_payload_for_log(payload))
+                try:
+                    res = self._call_api('query_recv_messages', payload)
+                except Exception as e:
+                    _logger.error("query_recv_messages error dla %s: %s", dn, e)
+                    res = False
+
+                if not isinstance(res, dict):
+                    _logger.warning("query_recv_messages: niepoprawny response: %s", res)
+                    continue
+
+                items = res.get('messages') or []
+                if not items:
+                    continue
+
+                for info in items:
+                    src = (info.get('source_number') or '').strip()        # klient
+                    dst = (info.get('destination_number') or '').strip()    # nasz DN
+                    text = (info.get('message') or '').strip()
+                    smsid = str(info.get('smsid') or '').strip()
+
+                    if not (src and dst and text and smsid):
+                        continue
+                    if dst != dn:
+                        continue
+
+                    self._save_incoming_to_conversation(
+                        src_number=src,
+                        dst_number=dst,
+                        body=text,
+                        external_id=smsid,
+                        event_date=fields.Datetime.now(),
+                    )
+
+        _logger.info("fetch_incoming_replies – done")
+
+    # ------------------------------------------------------
+    # GŁÓWNE: REST-only polling odpowiedzi (bez DLR)
+    # (NIE zmieniamy nazwy istniejącej metody)
+    # ------------------------------------------------------
+    @api.model
+    def poll_delivery_status(self):
+        """
+        REST-only:
+        - po każdym wywołaniu pobierz z API listę SMS-ów przychodzących (query_recv_messages)
+          na numery nadawcze użytkowników powiązanych z wiadomościami,
+        - zapisz je do rozmów i oznacz powiązane sms.message (has_reply=True).
+        """
+        _logger.info("poll_delivery_status (REST only) – start")
+
+        try:
+            users = self.search([]).mapped('user_id')
+            self.fetch_incoming_replies(users=users)
+        except Exception as e:
+            _logger.exception("poll_delivery_status → fetch_incoming_replies błąd: %s", e)
+
+        _logger.info("poll_delivery_status (REST only) – done")

@@ -37,7 +37,10 @@
         'web.assets_frontend': [
             'odoo17_sms_plugin/static/src/js/contacts_table.js',
             'odoo17_sms_plugin/static/src/xml/contacts_table.xml',
+            'odoo17_sms_plugin/static/src/js/campaning_messages_table.js',
+            'odoo17_sms_plugin/static/src/xml/campaning_messages_table.xml',
             'odoo17_sms_plugin/static/src/js/portal_sms_charcount.js',
+#"odoo17_sms_plugin/static/src/js/campaign_charts.js",
         ],
     },
     'installable': True,
