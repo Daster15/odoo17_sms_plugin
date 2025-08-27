@@ -254,6 +254,48 @@ class SmsCampaignPortal(http.Controller):
             'user_id': request.env.user.id,  # właściciel
         }
         campaign = request.env['sms.campaign'].sudo().create(vals)
+
+        csv_file = post.get('csv_file')
+        if csv_file:
+            try:
+                data = csv_file.read().decode('utf-8')
+                reader = csv.DictReader(io.StringIO(data))
+                Partner = request.env['res.partner'].sudo()
+                created = 0
+                limit = 10  # spójnie z wersją demo uploadu
+
+                for row in reader:
+                    if created >= limit:
+                        break
+
+                    phone = (row.get('phone') or row.get('phone_number') or
+                             row.get('numer') or row.get('numer_telefonu') or
+                             row.get('numer_odbiorcy') or '').strip()
+                    if not phone:
+                        continue
+
+                    # NOWE: per-wierszowa treść z kolumny 'message' (fallback do treści kampanii)
+                    msg_body = (row.get('message') or campaign.single_message or '').strip()
+
+                    partner = Partner.search([('phone', '=', phone)], limit=1)
+                    if not partner:
+                        partner = Partner.create({'name': phone, 'phone': phone})
+
+                    request.env['sms.message'].sudo().create({
+                        'campaign_id': campaign.id,
+                        'partner_id': partner.id,
+                        'body': msg_body,
+                        'state': 'draft',
+                        'sender_number': campaign.sender_number,
+                        'user_id': request.env.user.id,
+                    })
+                    created += 1
+
+                request.session['portal_success'] = f"Zaimportowano {created} rekordów z CSV (limit {limit})."
+            except Exception as e:
+                _logger.exception("Błąd importu CSV przy tworzeniu kampanii")
+                request.session['portal_warning'] = f"Błąd importu CSV: {e}"
+
         return request.redirect(f'/my/sms_campaigns/{campaign.id}')
 
     # ---------------------------------------------
@@ -316,7 +358,8 @@ class SmsCampaignPortal(http.Controller):
     # ---------------------------------------------
     # Import CSV (limit 10) – tylko moja
     # ---------------------------------------------
-    @http.route(['/my/sms_campaigns/<int:campaign_id>/upload_csv'], type='http', auth='user', methods=['POST'], website=True)
+    @http.route(['/my/sms_campaigns/<int:campaign_id>/upload_csv'], type='http', auth='user', methods=['POST'],
+                website=True)
     def portal_sms_campaign_upload_csv(self, campaign_id, **post):
         campaign = self._ensure_owner_or_404(campaign_id)
         if not campaign or campaign.state != 'draft':
@@ -332,15 +375,30 @@ class SmsCampaignPortal(http.Controller):
 
             Partner = request.env['res.partner'].sudo()
             created = 0
-            limit = 10  # maksymalna liczba rekordów do zaimportowania
+            limit = 10
 
             for row in reader:
                 if created >= limit:
                     _logger.info("Osiągnięto limit %s rekordów – pozostałe wiersze zostały pominięte", limit)
                     break
 
-                phone = (row.get('phone') or row.get('phone_number') or row.get('numer') or row.get('numer_telefonu') or row.get('numer_odbiorcy') or '').strip()
+                # Uczyń klucze nagłówków nieczułe na wielkość liter
+                row_ci = {(k or '').strip().lower(): (v or '').strip() for k, v in (row or {}).items()}
+
+                phone = (
+                        row_ci.get('phone')
+                        or row_ci.get('phone_number')
+                        or row_ci.get('numer')
+                        or row_ci.get('numer_telefonu')
+                        or row_ci.get('numer_odbiorcy')
+                        or ''
+                ).strip()
                 if not phone:
+                    continue
+
+                # NOWE: per-wierszowa treść z kolumny 'message' (jeśli podana), inaczej treść z kampanii
+                body_text = (row_ci.get('message') or '').strip() or (campaign.single_message or '').strip()
+                if not body_text:
                     continue
 
                 partner = Partner.search([('phone', '=', phone)], limit=1)
@@ -350,10 +408,10 @@ class SmsCampaignPortal(http.Controller):
                 request.env['sms.message'].sudo().create({
                     'campaign_id': campaign.id,
                     'partner_id': partner.id,
-                    'body': campaign.single_message,
+                    'body': body_text,  # <-- kluczowa zmiana
                     'state': 'draft',
                     'sender_number': campaign.sender_number,
-                    'user_id': request.env.user.id,  # właściciel wiadomości
+                    'user_id': request.env.user.id,
                 })
                 created += 1
 

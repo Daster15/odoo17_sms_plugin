@@ -70,7 +70,8 @@ class CampaignMessagesAction extends Component {
             body: r.partner_id[1],
             email: r.sms_gateway_response_human,
             sms_gateway_response_human: r.sms_gateway_response_human,
-            campaign_id: r.campaign_id
+            campaign_id: r.campaign_id,
+            message_body: r.body
         }));
         this.state.currentPage = 1;
     }

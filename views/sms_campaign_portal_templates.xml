@@ -321,10 +321,15 @@
                   Ponów
                 </a>
               </t>
-              <a t-att-href="'/my/sms_campaigns/%d/edit' % campaign.id"
+
+                 <t t-if="campaign.state=='draft'">
+                    <a t-att-href="'/my/sms_campaigns/%d/edit' % campaign.id"
                  class="btn btn-sm btn-outline-secondary">
                 <i class="fa fa-edit"/>
-              </a>
+                     </a>
+                 </t>
+
+
             </div>
           </div>
 
@@ -364,13 +369,15 @@
                 <h4 class="mb-0"><i class="fa fa-plus-circle me-2"></i>Nowa kampania SMS</h4>
               </div>
               <div class="card-body">
-                <form action="/my/sms_campaigns/new" method="post" class="row g-3">
+               <!-- <form action="/my/sms_campaigns/new" method="post" class="row g-3">-->
+                    <form action="/my/sms_campaigns/new" method="post" enctype="multipart/form-data" class="row g-3">
                   <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                   <div class="col-12">
                     <label class="form-label">Nazwa kampanii <span class="text-danger">*</span></label>
                     <input type="text" name="name" class="form-control" required="required"/>
                     <small class="text-muted">Unikalna nazwa identyfikująca kampanię</small>
                   </div>
+
                   <div class="col-md-6">
                     <label class="form-label">Data rozpoczęcia <span class="text-danger">*</span></label>
                     <input type="datetime-local" name="date_start" class="form-control" required="required"/>
@@ -380,6 +387,7 @@
                     <input type="datetime-local" name="date_end" class="form-control"/>
                     <small class="text-muted">Opcjonalna data automatycznego zakończenia</small>
                   </div>
+
                   <div class="col-12">
                     <label class="form-label">Treść wiadomości <span class="text-danger">*</span></label>
                     <textarea name="single_message" class="form-control" rows="3" required="required"></textarea>
@@ -394,6 +402,18 @@
                     </select>
                     <small class="text-muted">Wybierz numer z którego wyślemy SMS-y</small>
                   </div>
+
+                    <div class="col-12">
+    <label class="form-label">Import CSV (opcjonalnie)</label>
+    <input type="file" name="csv_file" accept=".csv" class="form-control"/>
+    <small class="text-muted">
+      Kolumny z numerem: phone, phone_number, numer, numer_telefonu, numer_odbiorcy.
+      Opcjonalnie kolumna <b>message</b> – nadpisze treść z kampanii dla danego wiersza.
+        <b>WERSJA DEMO max 10 rekordów</b>
+    </small>
+  </div>
+
+
                   <div class="col-12">
                     <div class="d-flex justify-content-end gap-2 pt-3 border-top">
                       <a href="/my/sms_campaigns" class="btn btn-outline-secondary">Anuluj</a>
@@ -436,6 +456,7 @@
                     <label class="form-label">Nazwa kampanii <span class="text-danger">*</span></label>
                     <input type="text" name="name" class="form-control" t-att-value="campaign.name" required="required"/>
                   </div>
+
                   <div class="col-md-6">
                     <label class="form-label">Data rozpoczęcia <span class="text-danger">*</span></label>
                     <input type="datetime-local" name="date_start" class="form-control"
@@ -447,6 +468,7 @@
                     <input type="datetime-local" class="form-control" disabled="disabled"
                            t-att-value="campaign.date_end and campaign.date_end.strftime('%Y-%m-%dT%H:%M')"/>
                   </div>
+
                   <div class="col-12">
                     <label class="form-label">Treść wiadomości <span class="text-danger">*</span></label>
                     <textarea name="single_message" class="form-control" rows="3" required="required"
@@ -464,6 +486,15 @@
                     <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
                   </div>
                 </form>
+
+                   <div class="card-body p-0">
+<t t-set="cmProps" t-value="{'campaign_id': campaign.name}"/>
+<owl-component
+    name="odoo17_sms_plugin.CampaignMessagesTable"
+    t-props="cmProps"
+/>
+                            </div>
+
 
                 <!-- Akcje na wiadomościach: usuń numery -->
                 <!--
@@ -590,7 +621,11 @@
                                         <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                         <div class="col-md-8">
                                             <input type="file" name="csv_file" accept=".csv" class="form-control form-control-sm"/>
-                                            <small class="text-muted">Plik importu CSV musi zawierać kolumnę z numerami o nazwie: 'phone_numer/numer_odbiorcy/numer_telefonu/numer' (wersja demo do 10 rekordów)</small>
+                                             <small class="text-muted">
+      Kolumny z numerem: phone, phone_number, numer, numer_telefonu, numer_odbiorcy.
+      Opcjonalnie kolumna <b>message</b> – nadpisze treść z kampanii dla danego wiersza.
+                                                 <b>WERSJA DEMO max 10 rekordów</b>
+    </small>
                                         </div>
                                         <div class="col-md-4">
                                             <button type="submit" class="btn btn-primary w-100">Importuj</button>
@@ -659,6 +694,7 @@
                                 <div class="d-grid gap-2">
                                     <t t-if="campaign.state=='draft'">
                                         <a t-att-href="'/my/sms_campaigns/%d/start' % campaign.id" class="btn btn-primary">Rozpocznij kampanię</a>
+                                        <a t-att-href="'/my/sms_campaigns/%d/edit' % campaign.id" class="btn btn-outline-primary">Edytuj kampanię</a>
                                     </t>
                                     <t t-elif="campaign.state=='running'">
                                         <a t-att-href="'/my/sms_campaigns/%d/stop' % campaign.id" class="btn btn-warning">Zatrzymaj kampanię</a>
@@ -670,8 +706,8 @@
 
                                        <!-- <a t-att-href="'/my/sms_campaigns/%d/retry' % campaign.id" class="btn btn-outline-secondary">Ponów nieudane</a>-->
                                         <a t-att-href="'/my/sms_campaigns/%d/retry_all' % campaign.id" class="btn btn-outline-secondary">Sprawdź statusy</a>
-                                    </t>
-                                    <a t-att-href="'/my/sms_campaigns/%d/edit' % campaign.id" class="btn btn-outline-primary">Edytuj kampanię</a>
+                                    </t >
+
                                 </div>
                             </div>
                         </div>
