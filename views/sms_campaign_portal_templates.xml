@@ -405,6 +405,9 @@
 
                     <div class="col-12">
     <label class="form-label">Import CSV (opcjonalnie)</label>
+                       <a href="/my/sms_campaigns/csv_template" class="btn btn-outline-secondary w-100">
+    Pobierz szablon CSV
+  </a>
     <input type="file" name="csv_file" accept=".csv" class="form-control"/>
     <small class="text-muted">
       Kolumny z numerem: phone, phone_number, numer, numer_telefonu, numer_odbiorcy.
@@ -621,6 +624,9 @@
                                         <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                         <div class="col-md-8">
                                             <input type="file" name="csv_file" accept=".csv" class="form-control form-control-sm"/>
+                                                          <a href="/my/sms_campaigns/csv_template" class="btn btn-outline-secondary w-100">
+    Pobierz szablon CSV
+  </a>
                                              <small class="text-muted">
       Kolumny z numerem: phone, phone_number, numer, numer_telefonu, numer_odbiorcy.
       Opcjonalnie kolumna <b>message</b> – nadpisze treść z kampanii dla danego wiersza.
