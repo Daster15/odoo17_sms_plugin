@@ -18,7 +18,7 @@
 
 
     <!-- 2. Lista kampanii SMS - Nowoczesny interfejs -->
-    <template id="sms_campaigns_list_page" name="Moje kampanie SMS">
+    <template id="sms_campaigns_list_page" name="Kampanie SMS">
         <t t-call="portal.portal_layout">
 
             <div class="container-fluid py-4">
@@ -36,48 +36,67 @@
 
 
                             <div class="card-body p-3">
-                                <form method="get" action="/my/sms_campaigns" class="row g-3">
-                                    <input type="hidden" name="view" t-att-value="view or 'grid'"/>
-                                    <div class="col-12">
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa fa-search text-muted"/></span>
-                                            <input type="text" name="search" class="form-control form-control-sm border-start-0" placeholder="Szukaj..." t-att-value="search or ''"/>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label small text-muted mb-1">Status</label>
-                                        <select name="status" class="form-select form-select-sm">
-                                            <option value="">Wszystkie statusy</option>
-                                            <option value="draft" t-att-selected="status=='draft'">Szkic</option>
-                                            <option value="running" t-att-selected="status=='running'">W trakcie</option>
-                                            <option value="done" t-att-selected="status=='done'">Zakończone</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label small text-muted mb-1">Grupowanie</label>
-                                        <select name="group_by" class="form-select form-select-sm">
-                                            <option value="">Brak grupowania</option>
-                                            <option value="status" t-att-selected="group_by=='status'">Status</option>
-                                            <option value="date_month" t-att-selected="group_by=='date_month'">Miesiąc</option>
-                                            <option value="date_year" t-att-selected="group_by=='date_year'">Rok</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label small text-muted mb-1">Zakres dat</label>
-                                        <div class="row g-2">
-                                            <div class="col-6">
-                                                <input type="date" name="date_from" class="form-control form-control-sm" placeholder="Od" t-att-value="date_from or ''"/>
-                                            </div>
-                                            <div class="col-6">
-                                                <input type="date" name="date_to" class="form-control form-control-sm" placeholder="Do" t-att-value="date_to or ''"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 pt-2">
-                                        <button type="submit" class="btn btn-sm btn-primary w-100">Zastosuj filtry</button>
-                                        <a href="/my/sms_campaigns" class="btn btn-sm btn-link w-100 text-muted mt-1">Wyczyść filtry</a>
-                                    </div>
-                                </form>
+                                <form class="mb-3" method="get" action="/my/sms_campaigns">
+  <!-- Szukaj po nazwie -->
+  <div class="mb-3">
+    <label class="form-label" for="f_search">Szukaj</label>
+    <input id="f_search" class="form-control" type="search" name="search"
+           t-att-value="search or ''" placeholder="Nazwa kampanii"/>
+  </div>
+
+  <!-- Status -->
+  <div class="mb-3">
+    <label class="form-label" for="f_status">Status</label>
+    <select id="f_status" class="form-select" name="status">
+      <option value="">Wszystkie statusy</option>
+      <option value="draft"     t-att-selected="(selected_status == 'draft') and 'selected' or None">Szkic</option>
+      <option value="scheduled" t-att-selected="(selected_status == 'scheduled') and 'selected' or None">Zaplanowana</option>
+      <option value="running"   t-att-selected="(selected_status == 'running') and 'selected' or None">Wysyłka</option>
+      <option value="done"      t-att-selected="(selected_status == 'done') and 'selected' or None">Zakończona</option>
+      <option value="cancel"    t-att-selected="(selected_status == 'cancel') and 'selected' or None">Anulowana</option>
+    </select>
+  </div>
+
+  <!-- Użytkownik (utworzył) – tylko z tego samego tenanta -->
+  <div class="mb-3">
+    <label class="form-label" for="f_user">Użytkownik</label>
+    <select id="f_user" class="form-select" name="user_id">
+      <option value="">Wszyscy użytkownicy</option>
+      <t t-foreach="allowed_users" t-as="u">
+        <option t-att-value="u.id"
+                t-att-selected="(selected_user_id == u.id) and 'selected' or None">
+          <t t-esc="u.name"/>
+        </option>
+      </t>
+    </select>
+  </div>
+
+  <!-- Zakres dat -->
+  <div class="mb-3">
+    <label class="form-label" for="f_date_from">Od</label>
+    <input id="f_date_from" class="form-control" type="date" name="date_from"
+           t-att-value="date_from or ''"/>
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="f_date_to">Do</label>
+    <input id="f_date_to" class="form-control" type="date" name="date_to"
+           t-att-value="date_to or ''"/>
+  </div>
+
+  <!-- Akcje -->
+  <div class="d-flex gap-2">
+    <button class="btn btn-primary" type="submit">Filtruj</button>
+    <a class="btn btn-outline-secondary" href="/my/sms_campaigns">Wyczyść</a>
+  </div>
+
+  <!-- (opcjonalnie) bieżące parametry widoku -->
+  <t t-if="view">
+    <input type="hidden" name="view" t-att-value="view"/>
+  </t>
+  <t t-if="group_by">
+    <input type="hidden" name="group_by" t-att-value="group_by"/>
+  </t>
+</form>
                             </div>
                         </div>
 
@@ -125,7 +144,7 @@
                     <main class="col-lg-9">
                         <!-- Nagłówek z przyciskami -->
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h4 class="mb-0">Moje kampanie SMS</h4>
+                            <h4 class="mb-0">Kampanie SMS</h4>
                             <div class="d-flex gap-2">
                                 <div class="btn-group shadow-sm">
                                     <a t-att-href="'/my/sms_campaigns?view=grid&amp;search=%s&amp;status=%s&amp;group_by=%s&amp;date_from=%s&amp;date_to=%s' % (search or '', status or '', group_by or '', date_from or '', date_to or '')"
@@ -262,18 +281,78 @@
                         else 'success'}">
 
           <!-- HEADER -->
-          <div class="card-header bg-white border-bottom-0">
-            <h5 class="card-title mb-0 text-truncate">
-              <a t-att-href="'/my/sms_campaigns/%d' % campaign.id"
-                 t-esc="campaign.name"
-                 class="text-decoration-none"
-                 t-att-class="{
-                   'draft':'text-secondary',
-                   'running':'text-primary',
-                   'done':'text-success'
-                 }[campaign.state]"/>
-            </h5>
-          </div>
+          <div class="card-header bg-white border-0 pb-0">
+  <div class="d-flex align-items-start justify-content-between gap-2">
+    <!-- LEWA: tytuł + meta -->
+    <div class="flex-grow-1 min-w-0">
+      <h5 class="card-title mb-1 text-truncate">
+        <a t-att-href="'/my/sms_campaigns/%d' % campaign.id"
+           class="text-decoration-none text-reset">
+          <t t-esc="campaign.name"/>
+        </a>
+      </h5>
+
+      <div class="d-flex flex-wrap align-items-center text-muted small gap-2">
+        <!-- kto utworzył -->
+        <span class="d-flex align-items-center">
+          <i class="fa fa-user me-1" aria-hidden="true"></i>
+          <span class="me-1">Utworzył(a):</span>
+          <strong class="text-body">
+            <t t-esc="(campaign.created_by_id and campaign.created_by_id.name) or '—'"/>
+          </strong>
+        </span>
+
+        <span class="vr mx-1 d-none d-sm-inline"></span>
+
+        <!-- kto uruchomił (tylko gdy done i jest wartość) -->
+        <t t-if="campaign.state == 'done' and campaign.launched_by_id">
+          <span class="d-flex align-items-center">
+            <i class="fa fa-rocket me-1" aria-hidden="true"></i>
+            <span class="me-1">Uruchomił(a):</span>
+            <strong class="text-body">
+              <t t-esc="campaign.launched_by_id.name"/>
+            </strong>
+          </span>
+          <span class="vr mx-1 d-none d-sm-inline"></span>
+        </t>
+
+        <!-- data utworzenia (bezpieczny fallback, gdy format_datetime jest None) -->
+        <t t-if="campaign.create_date">
+          <t t-set="dt" t-value="campaign.create_date"/>
+          <t t-set="dt_str"
+             t-value="format_datetime and format_datetime(dt, dt_format='dd.MM.yyyy HH:mm') or dt.strftime('%d.%m.%Y %H:%M')"/>
+          <span class="d-flex align-items-center">
+            <i class="fa fa-calendar me-1" aria-hidden="true"></i>
+            <span class="me-1">Utworzono:</span>
+            <span><t t-esc="dt_str"/></span>
+          </span>
+        </t>
+      </div>
+    </div>
+
+    <!-- PRAWA: plakietka stanu -->
+    <div class="text-nowrap ms-2">
+      <t t-set="state_label" t-value="{
+        'draft': 'Szkic',
+        'running': 'W trakcie',
+        'paused': 'Wstrzymana',
+        'done': 'Zakończona',
+        'cancel': 'Anulowana'
+      }.get(campaign.state, (campaign.state or '').capitalize())"/>
+      <t t-set="state_color" t-value="{
+        'draft':'secondary',
+        'running':'primary',
+        'paused':'warning',
+        'done':'success',
+        'cancel':'danger'
+      }.get(campaign.state, 'secondary')"/>
+      <span t-attf-class="badge rounded-pill bg-#{state_color}" t-att-title="state_label">
+        <t t-esc="state_label"/>
+      </span>
+    </div>
+  </div>
+</div>
+
 
           <!-- BODY -->
           <div class="card-body d-flex flex-column">
@@ -389,8 +468,8 @@
                   </div>
 
                   <div class="col-12">
-                    <label class="form-label">Treść wiadomości <span class="text-danger">*</span></label>
-                    <textarea name="single_message" class="form-control" rows="3" required="required"></textarea>
+                    <label class="form-label">Treść wiadomości </label>
+                    <textarea name="single_message" class="form-control" rows="3"></textarea>
                     <small class="text-muted">Wiadomość, która zostanie wysłana do każdego odbiorcy</small>
                   </div>
                   <div class="col-md-6">
@@ -473,8 +552,8 @@
                   </div>
 
                   <div class="col-12">
-                    <label class="form-label">Treść wiadomości <span class="text-danger">*</span></label>
-                    <textarea name="single_message" class="form-control" rows="3" required="required"
+                    <label class="form-label">Treść wiadomości </label>
+                    <textarea name="single_message" class="form-control" rows="3"
                               t-esc="campaign.single_message or ''"></textarea>
                   </div>
                   <div class="col-md-6">
@@ -600,7 +679,14 @@
 
                         <!-- Wiadomości -->
                         <div class="card border-0 shadow-sm">
-
+                <t t-if="campaign.state=='draft'">
+                <div class="mt-3">
+                  <form t-att-action="'/my/sms_campaigns/%d/clear_numbers' % campaign.id" method="post">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <button type="submit" class="btn btn-outline-danger">Usuń wszystkie numery</button>
+                  </form>
+                </div>
+                </t>
                             <div class="card-body p-0">
 <t t-set="cmProps" t-value="{'campaign_id': campaign.name}"/>
 <owl-component
@@ -629,7 +715,7 @@
   </a>
                                              <small class="text-muted">
       Kolumny z numerem: phone, phone_number, numer, numer_telefonu, numer_odbiorcy.
-      Opcjonalnie kolumna <b>message</b> – nadpisze treść z kampanii dla danego wiersza.
+      Opcjonalnie kolumna <b>message</b> – nadpisze treść z kampanii dla danego wiersza.Jeśli
                                                  <b>WERSJA DEMO max 10 rekordów</b>
     </small>
                                         </div>

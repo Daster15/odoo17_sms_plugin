@@ -13,6 +13,9 @@ import xlsxwriter
 _logger = logging.getLogger(__name__)
 
 
+
+
+
 def _user_allowed_days(u):
     days = []
     if u.send_on_monday:    days.append('Poniedziałek')
@@ -35,7 +38,22 @@ class SmsCampaignPortal(http.Controller):
     # --- Helper: upewnij się, że kampania należy do zalogowanego użytkownika ---
     def _ensure_owner_or_404(self, campaign_id: int):
         campaign = request.env['sms.campaign'].sudo().browse(int(campaign_id))
+        u = request.env.user
+        if not campaign.exists() or (campaign.tenant or '') != (u.sms_api_tenant or ''):
+            return None
+        return campaign
+
+
+    def _ensure_owner_or_404_old(self, campaign_id: int):
+        campaign = request.env['sms.campaign'].sudo().browse(int(campaign_id))
         if not campaign.exists() or campaign.user_id.id != request.env.user.id:
+            return None
+        return campaign
+
+    def _ensure_same_tenant_or_404(self, campaign_id: int):
+        campaign = request.env['sms.campaign'].sudo().browse(int(campaign_id))
+        u = request.env.user
+        if not campaign.exists() or (campaign.tenant or '') != (u.sms_api_tenant or ''):
             return None
         return campaign
 
@@ -43,20 +61,23 @@ class SmsCampaignPortal(http.Controller):
     # Lista kampanii (tylko moje)
     # ---------------------------------------------
     @http.route(['/my/sms_campaigns'], type='http', auth='user', website=True)
-    def portal_my_sms_campaigns(self, search=None, status=None, view='grid',
+    def portal_my_sms_campaigns(self, search=None, status=None, user_id=None, view='grid',
                                 group_by=None, date_from=None, date_to=None, page=1, **kw):
         """
-        Renderuje listę kampanii SMS z paginacją i filtrami (tylko kampanie zalogowanego użytkownika)
+        Lista kampanii SMS z paginacją i filtrami – WIDOCZNE dla wszystkich użytkowników
+        z tego samego tenanta (tenant-sharing). Dodatkowy filtr po użytkowniku.
         """
-        uid = request.env.user.id
+        u = request.env.user
         Campaign = request.env['sms.campaign'].sudo()
-        domain = [('user_id', '=', uid)]
+        domain = [('tenant', '=', (u.sms_api_tenant or ''))]  # CHANGED: filtr po tenancie
 
         # Filtry
         if search:
             domain.append(('name', 'ilike', search))
         if status:
             domain.append(('state', '=', status))
+        if user_id:
+            domain.append(('user_id', '=', int(user_id)))  # CHANGED: filtr po właścicielu (twórcy)
         if date_from:
             domain.append(('date_start', '>=', date_from))
         if date_to:
@@ -86,22 +107,27 @@ class SmsCampaignPortal(http.Controller):
             'stats_total_failed': _sum('failed_count'),
         }
 
-        u = request.env.user  # bez sudo: czytamy z profilu zalogowanego
+        # Dni/godziny z profilu + użytkownicy z tego samego tenanta do filtra
+        allowed_users = request.env['res.users'].sudo().search([
+            ('sms_api_tenant', '=', (u.sms_api_tenant or ''))
+        ])
         allowed_days = _user_allowed_days(u)
         hours_from = u.hours_from or 0.0
         hours_to = u.hours_to or 0.0
 
         return request.render('odoo17_sms_plugin.sms_campaigns_list_page', {
-            'my_campaigns': campaigns,
-            'search':       search,
-            'status':       status,
-            'view':         view,
-            'group_by':     group_by,
-            'date_from':    date_from,
-            'date_to':      date_to,
-            'page':         page,
-            'page_size':    page_size,
-            'page_count':   math.ceil(total_campaigns / page_size),
+            'my_campaigns': campaigns,  # zostawiamy nazwę zmiennej jak było
+            'search': search,
+            'status': status,
+            'selected_user_id': int(user_id) if user_id else False,  # CHANGED
+            'allowed_users': allowed_users,  # CHANGED
+            'view': view,
+            'group_by': group_by,
+            'date_from': date_from,
+            'date_to': date_to,
+            'page': page,
+            'page_size': page_size,
+            'page_count': math.ceil(total_campaigns / page_size),
             'total_campaigns': total_campaigns,
             'allowed_days': allowed_days,
             'hours_from': hours_from,
@@ -146,25 +172,27 @@ class SmsCampaignPortal(http.Controller):
     @http.route(['/my/sms_campaigns/<int:campaign_id>'], type='http', auth='user', website=True)
     def portal_sms_campaign_detail(self, campaign_id, page=1, **kw):
         """
-        Renderuje szczegóły kampanii z paginacją wiadomości (widoczne tylko dla właściciela)
+        Szczegóły kampanii z paginacją wiadomości – WIDOCZNE dla wszystkich użytkowników
+        z tego samego tenanta (tenant-sharing).
         """
-        campaign = self._ensure_owner_or_404(campaign_id)
+        campaign = self._ensure_same_tenant_or_404(campaign_id)  # CHANGED: kontrola po tenancie
         if not campaign:
             return request.not_found()
 
-        # Paginacja wiadomości (dodatkowo filtrujemy po user_id aby nie pokazać cudzych)
+        # Paginacja wiadomości (BEZ filtra po user_id – wszyscy w tenancie widzą kampanię)
         page_size = 20
         page = int(page or 1)
         Message = request.env['sms.message'].sudo()
-        domain = [('campaign_id', '=', campaign.id), ('user_id', '=', request.env.user.id)]
+        domain = [('campaign_id', '=', campaign.id)]  # CHANGED: usunięto ('user_id', '=', request.env.user.id)
         total_messages = Message.search_count(domain)
         messages = Message.search(domain, offset=(page - 1) * page_size, limit=page_size, order='date_scheduled desc')
         page_count = math.ceil(total_messages / page_size)
 
-        # Dane do wykresu
+        # Dane do wykresu (cała kampania)
         labels = ['Oczekujące', 'Zaplanowane', 'Wysłane', 'Dostarczone', 'Nieudane']
         states = ['draft', 'scheduled', 'sent', 'delivered', 'failed']
-        values = [Message.search_count([('campaign_id', '=', campaign.id), ('state', '=', st), ('user_id', '=', request.env.user.id)]) for st in states]
+        values = [Message.search_count([('campaign_id', '=', campaign.id), ('state', '=', st)]) for st in
+                  states]  # CHANGED
 
         return request.render('odoo17_sms_plugin.sms_campaign_detail_page', {
             'campaign': campaign.sudo(),
@@ -259,7 +287,7 @@ class SmsCampaignPortal(http.Controller):
         sender_number = (post.get('sender_number') or '').strip()
         raw_start = post.get('date_start')
 
-        if not (name and single_message and sender_number and raw_start):
+        if not (name and sender_number and raw_start):
             request.session['portal_warning'] = "Brak wymaganych pól."
             return request.redirect('/my/sms_campaigns/new')
 
@@ -275,7 +303,7 @@ class SmsCampaignPortal(http.Controller):
             request.session['portal_warning'] = message
             return request.redirect('/my/sms_campaigns/new')
 
-        # Tworzenie kampanii (właściciel = bieżący user)
+        # Tworzenie kampanii: właściciel = bieżący user, TENANT = z profilu użytkownika (CHANGED)
         vals = {
             'name': name,
             'state': 'draft',
@@ -283,6 +311,7 @@ class SmsCampaignPortal(http.Controller):
             'sender_number': sender_number,
             'date_start': date_start,
             'user_id': request.env.user.id,
+            'tenant': request.env.user.sms_api_tenant or '',  # CHANGED
         }
         campaign = request.env['sms.campaign'].sudo().create(vals)
 
@@ -293,20 +322,17 @@ class SmsCampaignPortal(http.Controller):
                 filename = getattr(csv_file, 'filename', None)
                 content_type = getattr(csv_file, 'content_type', None)
                 raw = csv_file.read()  # bytes
-                # Obsłuż BOM i polskie znaki
                 data = raw.decode('utf-8-sig') if raw.startswith(b'\xef\xbb\xbf') else raw.decode('utf-8',
                                                                                                   errors='replace')
-
                 _logger.info(
                     "Start importu CSV (create): campaign_id=%s, user_id=%s, filename=%s, content_type=%s, size=%sB",
                     campaign.id, request.env.user.id, filename, content_type, len(raw)
                 )
 
-                # Reader + ujednolicenie nagłówków (lowercase)
                 reader = csv.DictReader(io.StringIO(data))
                 Partner = request.env['res.partner'].sudo()
                 created = 0
-                limit = 10  # spójnie z uploadem na stronie szczegółów
+                limit = 10
 
                 skipped_no_phone = 0
                 skipped_no_body = 0
@@ -319,6 +345,7 @@ class SmsCampaignPortal(http.Controller):
                         break
 
                     row_ci = {(k or '').strip().lower(): (v or '').strip() for k, v in (row or {}).items()}
+
                     phone = (
                             row_ci.get('phone')
                             or row_ci.get('phone_number')
@@ -329,23 +356,19 @@ class SmsCampaignPortal(http.Controller):
                     ).strip()
                     if not phone:
                         skipped_no_phone += 1
-                        _logger.debug("Pominięto wiersz %s: brak numeru telefonu. Nagłówki=%s", idx,
-                                      list((row or {}).keys()))
                         continue
 
-                    body_text = (row_ci.get('message') or '').strip() or (campaign.single_message or '').strip()
+                    body_text = row_ci.get('message') or single_message or ''
                     if not body_text:
                         skipped_no_body += 1
-                        _logger.debug("Pominięto wiersz %s: brak treści (message) oraz treści domyślnej w kampanii.",
-                                      idx)
                         continue
 
                     partner = Partner.search([('phone', '=', phone)], limit=1)
-                    if not partner:
+                    if partner:
+                        matched_contacts += 1
+                    else:
                         partner = Partner.create({'name': phone, 'phone': phone})
                         created_contacts += 1
-                    else:
-                        matched_contacts += 1
 
                     request.env['sms.message'].sudo().create({
                         'campaign_id': campaign.id,
@@ -428,7 +451,7 @@ class SmsCampaignPortal(http.Controller):
             return request.not_found()
         # Usuń tylko wiadomości należące do tej kampanii (pośrednio do usera – bo kampania jego)
         campaign.message_ids.sudo().unlink()
-        return request.redirect(f'/my/sms_campaigns/{campaign.id}/edit')
+        return request.redirect(f'/my/sms_campaigns/{campaign.id}')
 
     # ---------------------------------------------
     # Import CSV (limit 10) – tylko moja

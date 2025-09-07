@@ -52,6 +52,8 @@ class SmsMessage(models.Model):
         required=True
     )
 
+    tenant = fields.Char(related='campaign_id.tenant', store=True, index=True)
+
 
     def _get_available_sender_numbers(self):
         """Zwraca listę tuple (value, label) z numerami nadawcy

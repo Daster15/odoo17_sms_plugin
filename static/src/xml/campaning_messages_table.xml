@@ -2,64 +2,138 @@
 <templates xml:space="preserve">
   <t t-name="odoo17_sms_plugin.CampaignMessagesTable">
     <div class="container">
-      <h5 class="mt-2 mb-2">Lista numerów i wiadomości</h5>
-      <!--
-      <div class="d-flex justify-content-between mb-2 mt-2">
-        <input t-ref="body" type="text" class="form-control"
-               t-on-keyup="(e)=>this.searchMessages(e)"/>
-        <button class="btn btn-primary oi oi-search mx-2"
-                t-on-click="searchMessages"/>
+
+      <div class="row g-2 align-items-center my-2">
+        <div class="col-12 col-md-6">
+          <div class="input-group">
+            <span class="input-group-text">Szukaj</span>
+            <input type="search"
+                   class="form-control"
+                   placeholder="Wyszukaj po numerze, treści, nadawcy lub odpowiedzi..."
+                   t-on-input="onSearchInput"/>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 text-end small text-muted">
+          <t t-esc="filteredRows().length"/> pasujących rekordów
+        </div>
       </div>
-      -->
+
       <div style="max-height: 500px; overflow-y: auto;">
-        <table class="table">
+        <table class="table table-sm table-hover align-middle">
           <thead class="sticky-top bg-dark text-white">
             <tr>
-              <th scope="col">#</th>
-              <th scope="col">Numer</th>
-              <th scope="col">Treść</th>
-              <th scope="col">Odpowiedź z bramki</th>
-              <th scope="col">...</th>
+              <th role="button" class="user-select-none"
+                  t-att-data-col="'partner_name'"
+                  t-on-click="onHeaderClick">
+                Numer <span class="ms-1"><t t-esc="sortIndicator('partner_name')"/></span>
+              </th>
+              <th role="button" class="user-select-none"
+                  t-att-data-col="'message_body'"
+                  t-on-click="onHeaderClick">
+                Wiadomość <span class="ms-1"><t t-esc="sortIndicator('message_body')"/></span>
+              </th>
+              <!--
+              <th role="button" class="user-select-none"
+                  t-att-data-col="'sender_number'"
+                  t-on-click="onHeaderClick">
+                Nadawca <span class="ms-1"><t t-esc="sortIndicator('sender_number')"/></span>
+              </th>
+              -->
+              <th role="button" class="user-select-none"
+                  t-att-data-col="'response'"
+                  t-on-click="onHeaderClick">
+                Odpowiedź bramki <span class="ms-1"><t t-esc="sortIndicator('response')"/></span>
+              </th>
+              <th>
+                ...
+              </th>
             </tr>
           </thead>
           <tbody>
-            <t t-foreach="paginatedMessages()" t-as="partner" t-key="partner.id">
+            <t t-foreach="paginatedRows()" t-as="row" t-key="row.id">
               <tr>
-                <th scope="row">
-                  <span t-esc="((state.currentPage-1)*state.pageSize) + (partner_index+1)"/>
-                </th>
-                <td><t t-esc="partner.body or '-'"/></td>
-                <td><t t-esc="partner.message_body or '-'"/></td>
-                <td><t t-esc="partner.sms_gateway_response_human or '-'"/></td>
-                <td>..</td>
+                <td><t t-esc="row.partner_name or '-'"/></td>
+                <td class="text-break"><t t-esc="row.message_body or ''"/></td>
+
+                <td><t t-esc="row.response or '-'"/></td>
+                <td class="text-nowrap">
+                  <t t-if="!state.campaignClosed">
+                  <button class="btn btn-outline-primary btn-sm me-2"
+                          t-on-click="()=>this.updateMessage(row)"
+                          data-bs-toggle="modal"
+                          data-bs-target="#exampleModal">
+                    Update
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm"
+                          t-on-click="()=>this.deleteMessage(row)">
+                    Delete
+                  </button>
+                  </t>
+
+                </td>
               </tr>
             </t>
           </tbody>
         </table>
       </div>
-      <!-- Kontrolki paginacji -->
-      <nav aria-label="Pagination">
-        <ul class="pagination justify-content-center mt-3">
+
+      <!-- Paginacja -->
+      <nav class="mt-2" aria-label="Paginacja">
+        <ul class="pagination pagination-sm mb-0">
           <li class="page-item" t-att-class="{'disabled': state.currentPage === 1}">
-            <a class="page-link" href="#" t-on-click.prevent="prevPage">Poprzednia</a>
+            <a class="page-link" href="#" t-on-click.prevent="onPrevPage">Poprzednia</a>
           </li>
-          <t t-foreach="Array(totalPages()).fill().map((_, i) => i + 1)"
-   t-as="pageNum"
-   t-key="pageNum">
-  <li class="page-item" t-att-class="{'active': state.currentPage === pageNum}">
-    <a class="page-link"
-       href="#"
-       t-on-click.prevent="()=>this.goToPage(pageNum)">
-      <t t-esc="pageNum"/>
-    </a>
-  </li>
-</t>
-          <li class="page-item"
-              t-att-class="{'disabled': state.currentPage === totalPages()}">
-            <a class="page-link" href="#" t-on-click.prevent="nextPage">Następna</a>
+
+          <t t-foreach="pageNumbers()" t-as="pageNum" t-key="pageNum">
+            <li class="page-item" t-att-class="{'active': state.currentPage === pageNum}">
+              <a class="page-link"
+                 href="#"
+                 t-att-data-page="pageNum"
+                 t-on-click.prevent="onGoToPage">
+                <t t-esc="pageNum"/>
+              </a>
+            </li>
+          </t>
+
+          <li class="page-item" t-att-class="{'disabled': state.currentPage === totalPages()}">
+            <a class="page-link" href="#" t-on-click.prevent="onNextPage">Następna</a>
           </li>
         </ul>
       </nav>
+
+
+      <div class="modal fade" id="exampleModal" tabindex="-1"
+     aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edycja wiadomości</h5>
+        <button type="button" class="btn-close"
+                data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="container">
+          <!-- ID tylko do podglądu -->
+          <!--<input type="text" class="form-control m-2"
+                 placeholder="ID" t-model="state.editing.id" disabled="1"/>-->
+
+          <!-- Treść wiadomości -->
+          <textarea class="form-control m-2"
+                    placeholder="Treść wiadomości"
+                    t-model="state.editing.body"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary m-2"
+                data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary m-2"
+                t-on-click="saveMessage">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
 
     </div>
   </t>

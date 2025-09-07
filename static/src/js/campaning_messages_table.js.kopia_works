@@ -1,0 +1,180 @@
+/** @odoo-module **/
+import { registry } from "@web/core/registry";
+import { Component, useState, onWillStart } from "@odoo/owl";
+
+class CampaignMessagesAction extends Component {
+    static props = { campaign_id: [Number, String] };
+    static template = "odoo17_sms_plugin.CampaignMessagesTable";
+
+    setup() {
+        this.orm = this.env.services.orm;
+        this.resModel = "sms.message";
+
+        // campaignId: props -> URL
+        const fromProps = this.props?.campaign_id ?? null;
+        const m = window.location.pathname.match(/\/my\/sms_campaigns\/(\d+)/);
+        const fromUrl = m ? Number(m[1]) : null;
+        this.campaignId = Number(fromProps ?? fromUrl ?? 0) || null;
+
+        this.state = useState({
+            rows: [],
+            currentPage: 1,
+            pageSize: 10,
+            search: "",
+            sortBy: "partner_name",
+            sortDir: "asc",
+            editing: { id: null, body: "" },
+            campaignClosed: false,
+        });
+
+        onWillStart(this.fetchAll);
+    }
+
+    // ===== RPC =====
+    fetchAll = async () => {
+        const domain = [["campaign_id", "=", this.campaignId]];
+        const ids = await this.orm.search(this.resModel, domain);
+        if (!ids.length) {
+            this.state.rows = [];
+            this.state.currentPage = 1;
+            return;
+        }
+        const records = await this.orm.read(this.resModel, ids, [
+            "body",
+            "partner_id",
+            "sms_gateway_response",
+            "sms_gateway_response_human",
+        ]);
+        this.state.rows = records.map((r) => ({
+            id: r.id,
+            partner_name: r.partner_id ? r.partner_id[1] : "",
+            message_body: r.body || "",
+            response: r.sms_gateway_response_human || r.sms_gateway_response || "",
+        }));
+        this.state.currentPage = 1;
+    };
+
+    // ===== Search =====
+    onSearchInput = (ev) => {
+        this.state.search = ev.target.value || "";
+        this.state.currentPage = 1;
+    };
+
+    // ===== Sort =====
+    onHeaderClick = (ev) => {
+        const col = ev.currentTarget.dataset.col; // z data-col w <th>
+        if (!col) return;
+        if (this.state.sortBy === col) {
+            this.state.sortDir = this.state.sortDir === "asc" ? "desc" : "asc";
+        } else {
+            this.state.sortBy = col;
+            this.state.sortDir = "asc";
+        }
+        this.state.currentPage = 1;
+    };
+
+    sortIndicator(col) {
+        if (this.state.sortBy !== col) return "";
+        return this.state.sortDir === "asc" ? "▲" : "▼";
+    }
+
+    // ===== Data pipeline =====
+    filteredRows() {
+        const q = (this.state.search || "").trim().toLowerCase();
+        if (!q) return this.state.rows;
+        return this.state.rows.filter((r) =>
+            ["partner_name", "message_body", "response"].some((k) =>
+                (r[k] || "").toString().toLowerCase().includes(q)
+            )
+        );
+    }
+
+    sortedRows() {
+        const list = [...this.filteredRows()];
+        const { sortBy, sortDir } = this.state;
+        return list.sort((a, b) => {
+            const va = (a[sortBy] ?? "").toString().toLowerCase();
+            const vb = (b[sortBy] ?? "").toString().toLowerCase();
+            if (va < vb) return sortDir === "asc" ? -1 : 1;
+            if (va > vb) return sortDir === "asc" ? 1 : -1;
+            return 0;
+        });
+    }
+
+    paginatedRows() {
+        const list = this.sortedRows();
+        const start = (this.state.currentPage - 1) * this.state.pageSize;
+        return list.slice(start, start + this.state.pageSize);
+    }
+
+    totalPages() {
+        return Math.max(1, Math.ceil(this.filteredRows().length / this.state.pageSize));
+    }
+
+    pageNumbers() {
+        const n = this.totalPages();
+        const arr = [];
+        for (let i = 1; i <= n; i++) arr.push(i);
+        return arr;
+    }
+
+    // ===== Pagination =====
+    onPrevPage = () => {
+        if (this.state.currentPage > 1) this.state.currentPage--;
+    };
+    onNextPage = () => {
+        if (this.state.currentPage < this.totalPages()) this.state.currentPage++;
+    };
+    onGoToPage = (ev) => {
+        const page = Number(ev.currentTarget.dataset.page);
+        if (page >= 1 && page <= this.totalPages()) this.state.currentPage = page;
+    };
+
+
+    updateMessage(row) {
+        this.state.editing = {
+        id: row.id,
+        body: row.message_body || "",  // pole z tabeli
+    };
+}
+
+async saveMessage() {
+  const e = this.state.editing;
+  if (!e || !e.id) return;
+
+  // zapis w modelu – pole body
+  await this.orm.write(this.resModel, [e.id], { body: e.body });
+
+  // podmień dane w tabeli bez ponownego fetch
+  const i = this.state.rows.findIndex(r => r.id === e.id);
+  if (i !== -1) {
+    this.state.rows[i] = { ...this.state.rows[i], message_body: e.body };
+  }
+
+  // wyczyść edycję i zamknij modal (kliknij Close, jeśli jest)
+  this.state.editing = { id: null, body: "" };
+  document.querySelector('#exampleModal [data-bs-dismiss="modal"]')?.click();
+}
+
+   async deleteMessage(row) {
+  await this.orm.unlink(this.resModel, [row.id]);
+
+  // usuń z listy rows (a nie z "message")
+  this.state.rows = this.state.rows.filter(r => r.id !== row.id);
+
+  // ewentualnie skoryguj stronę po usunięciu
+  const tp = this.totalPages();
+  if (this.state.currentPage > tp) this.state.currentPage = tp;
+
+  // jeśli akurat edytowaliśmy ten rekord – wyczyść formularz
+  if (this.state.editing?.id === row.id) {
+    this.state.editing = { id: null, body: "" };
+  }
+}
+
+}
+
+registry.category("public_components").add(
+    "odoo17_sms_plugin.CampaignMessagesTable",
+    CampaignMessagesAction
+);

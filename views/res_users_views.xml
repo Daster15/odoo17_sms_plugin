@@ -17,6 +17,9 @@
                    placeholder="Wybierz domyślny numer"/>
           </group>
           <group>
+            <field name="sms_api_tenant"/>
+          </group>
+          <group>
             <field name="stats_email"/>
           </group>
           <group>

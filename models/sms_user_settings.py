@@ -25,6 +25,10 @@ class ResUsers(models.Model):
         string='E-mail do wysyłki statystyk',
         help='Statystyki SMS będą wysyłane na ten adres')
 
+    sms_api_tenant = fields.Char(
+        string='Organizacja',
+        help='Organizacja')
+
     sms_api_endpoint = fields.Char(
         string='Sms api endpoint',
         help='Sms api endpoint')

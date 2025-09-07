@@ -28,7 +28,7 @@ class SmsCampaign(models.Model):
     ], string='Status', default='draft', tracking=True)
 
     #single_message = fields.Boolean(string='Single Message')
-    single_message = fields.Text(string = 'Treść wiadomości',required = True,help = 'Wiadomość, która zostanie wysłana do każdego odbiorcy')
+    single_message = fields.Text(string = 'Treść wiadomości',help = 'Wiadomość, która zostanie wysłana do każdego odbiorcy')
 
     sender_number = fields.Selection(
         selection='_get_available_campaning_sender_numbers',
@@ -43,14 +43,45 @@ class SmsCampaign(models.Model):
         default=lambda self: self.env.user, index=True
     )
 
+    tenant = fields.Char(
+        string='Tenant',
+        required=True,
+        index=True,
+        default=lambda self: self.env.user.sms_api_tenant,
+        tracking=True,
+    )
+    created_by_id = fields.Many2one(
+        'res.users',
+        string='Utworzona przez',
+        default=lambda self: self.env.user,
+        readonly=True,
+        tracking=True,
+    )
+    launched_by_id = fields.Many2one(
+        'res.users',
+        string='Uruchomiona przez',
+        readonly=True,
+        tracking=True,
+    )
+
     report_sent = fields.Boolean(string='Raport wysłany', default=False)
 
-
+    def write(self, vals):
+        res = super().write(vals)
+        if 'sender_number' in vals:
+            for campaign in self:
+                # Propaguj nowy numer do wszystkich wiadomości w tej kampanii
+                campaign.message_ids.sudo().write({
+                    'sender_number': campaign.sender_number
+                })
+        return res
 
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
             vals.setdefault('user_id', self.env.user.id)
+        vals.setdefault('tenant', self.env.user.sms_api_tenant or '')
+        vals.setdefault('created_by_id', self.env.user.id)
         return super().create(vals_list)
 
     def _get_available_campaning_sender_numbers_old(self):
@@ -380,6 +411,11 @@ class SmsCampaign(models.Model):
 
     def action_start(self):
         """Uruchamia kampanię, wysyła wszystkie wiadomości i kończy kampanię."""
+        for rec in self:
+            # strażnik: tylko ktoś z tego samego tenanta
+            if rec.tenant != self.env.user.sms_api_tenant:
+                raise UserError(_("Brak uprawnień do uruchomienia tej kampanii."))
+            rec.launched_by_id = self.env.user
         now = fields.Datetime.now()
         for campaign in self:
             if campaign.state != 'draft':
